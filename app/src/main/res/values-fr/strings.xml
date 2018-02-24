@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tagtoo</string>
+    <string name="tab_text_1">Accueil</string>
+    <string name="tab_text_2">Lire</string>
+    <string name="tab_text_3">Ecrire</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="section_format">Hello World depuis la section: %1$d</string>
+    <string name="title_activity_help">Aide</string>
+</resources>
