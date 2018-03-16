@@ -106,7 +106,23 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginBottom="20dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginVertical="20dp"
+            android:clickable="true"
+            android:scaleType="center"
+            android:tint="@android:color/white"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/ic_help_outline_black_48dp" />
+    </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

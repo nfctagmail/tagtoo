@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="262dp"
-        android:layout_height="128dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/rounded_edittext"
-        android:elevation="8dp"
-        android:ems="10"
-        android:hint="Your message"
-        android:inputType="textShortMessage"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorAccent"
-        android:elevation="2dp"
-        android:text="Envoyer"
-        android:textColor="@android:color/background_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/buttontext"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="32dp"
+        android:autoText="false"
+        android:background="@color/colorPrimary100"
+        android:text="@string/button_text"
+        android:textColor="@android:color/black"
+        android:textColorHighlight="@color/colorDisabled"
+        app:layout_constraintBottom_toTopOf="@+id/buttonvideo"
+        app:layout_constraintEnd_toStartOf="@+id/buttonaudio"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.88" />
+
+    <Button
+        android:id="@+id/buttonaudio"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="32dp"
+        android:autoText="false"
+        android:background="@color/colorPrimary100"
+        android:text="@string/button_audio"
+        app:layout_constraintBottom_toTopOf="@+id/buttonimage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttontext"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/buttonvideo"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginBottom="70dp"
+        android:autoText="false"
+        android:background="@color/colorPrimary100"
+        android:text="@string/button_video"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonimage"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttontext" />
+
+    <Button
+        android:id="@+id/buttonimage"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginBottom="70dp"
+        android:autoText="false"
+        android:background="@color/colorPrimary100"
+        android:text="@string/button_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonvideo"
+        app:layout_constraintTop_toBottomOf="@+id/buttonaudio" />
 </android.support.constraint.ConstraintLayout>

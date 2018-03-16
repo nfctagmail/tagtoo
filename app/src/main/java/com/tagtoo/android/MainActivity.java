@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
 
     private static ArrayList<SavedMessage> listMessages = new ArrayList<>();
+    private static ArrayList<SavedMessage> gsonMessages = new ArrayList<>();
 
     private BottomNavigationView navigation;
 
@@ -89,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
         Gson gson                = new Gson();
         String messagesSaved     = mPrefs.getString(saved_var_id, null);
         Type type                = new TypeToken<ArrayList<SavedMessage>>() {}.getType();
-        listMessages             = gson.fromJson(messagesSaved, type);
+        gsonMessages             = gson.fromJson(messagesSaved, type);
+        if(gsonMessages != null)
+            listMessages = gsonMessages;
 
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -103,14 +106,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 startHelpActivity();
             }
-        });*/
+        });
     }
 
     public void startHelpActivity(){

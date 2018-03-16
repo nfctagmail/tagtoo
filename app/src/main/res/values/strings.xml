@@ -10,4 +10,9 @@
     <string name="title_home">Home</string>
     <string name="title_read">Read</string>
     <string name="title_write">Write</string>
+    <string name="button_text">Texte</string>
+    <string name="button_audio">Audio</string>
+    <string name="button_video">Video</string>
+    <string name="button_image">Image</string>
+
 </resources>

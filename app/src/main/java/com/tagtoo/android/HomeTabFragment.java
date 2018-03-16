@@ -1,5 +1,6 @@
 package com.tagtoo.android;
 
+import com.tagtoo.android.R;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentTransaction;
 import android.nfc.NfcAdapter;
