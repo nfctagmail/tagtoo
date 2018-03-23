@@ -66,6 +66,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tagtoo.android.MainActivity" />
         </activity>
+        <activity android:name=".WriteTextActivity"></activity>
     </application>
 
 </manifest>

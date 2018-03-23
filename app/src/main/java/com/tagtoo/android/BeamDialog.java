@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNdefMessageCallback
 {
 
-/*
-
     String mMessage;
 
     static BeamDialog newInstance(String message) {
@@ -45,6 +43,6 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
 
 
         return v;
-    }*/
+    }
 
 }
