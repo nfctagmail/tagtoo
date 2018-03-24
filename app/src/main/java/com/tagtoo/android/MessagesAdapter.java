@@ -49,7 +49,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
         private final TextView info;
         private final ImageButton deleteButton;
 
-        private MainActivity.SavedMessage currentPair;
+        //private MainActivity.SavedMessage currentPair;
 
         public MessageViewHolder(final View itemView){
             super(itemView);
@@ -66,18 +66,18 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
         }
 
         public void display(MainActivity.SavedMessage savedMessage){
-            currentPair = savedMessage;
+            //currentPair = savedMessage;
             messagetw.setText(savedMessage.content);
             info.setText(savedMessage.dateSaved);
         }
 
         public void remove(int position){
-            messages.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, messages.size());
-            if(mContext instanceof MainActivity) {
-                ((MainActivity) mContext).saveMessages(messages);
-                ((MainActivity) mContext).setFragment(new HomeTabFragment());
+            messages.remove(position);                                              // On enlève de la liste le message correspondantà la position renseignée
+            notifyItemRemoved(position);                                            // On actualise la liste
+            notifyItemRangeChanged(position, messages.size());                      //
+            if(mContext instanceof MainActivity) {                                  // Si on est dans le contexte de l'activité principale
+                ((MainActivity) mContext).saveMessages(messages);                   // On appelle ses fonctions pour sauvegarder les messages ...
+                ((MainActivity) mContext).setFragment(new HomeTabFragment());       // ... et actualiser le fragment
             }
 
         }

@@ -30,8 +30,9 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
     {
         super.onCreate(savedInstanceState);
 
-        // Do not create a new Fragment when the Activity is re-created such as orientation changes.
+        // Ne pas recréer le fragment (la boîte de dialogue) quand l'activité change
         setRetainInstance(true);
+        // On choisit le style : normal et clair
         setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog);
     }
 
@@ -39,8 +40,6 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View v = inflater.inflate(R.layout.dialog_beam_message, container, false);
-
-
 
         return v;
     }
