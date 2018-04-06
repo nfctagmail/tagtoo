@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tagtoo.android">
 
-    <!-- Permissions et fonctionnalités de l'app : NFC -->
+    <!-- Permissions et fonctionnalités de l'app : NFC et enregistrement audio -->
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature
         android:name="android.hardware.nfc"
