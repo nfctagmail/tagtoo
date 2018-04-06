@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_toStartOf="@+id/deleteButton"
-        android:text="Très très très très très très très très très long message"
+        android:text="Message"
         android:textSize="24sp" />
 
     <!--android:layout_alignParentStart="true"

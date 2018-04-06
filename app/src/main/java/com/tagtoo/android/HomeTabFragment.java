@@ -87,7 +87,7 @@ public class HomeTabFragment extends Fragment {
         }
 
         // Si le nfc est désactivé
-        if(!mNfcAdapter.isEnabled())
+        else if( !mNfcAdapter.isEnabled())
         {
             Log.i(LOG_TAG, "NFC is disabled");
 

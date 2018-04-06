@@ -30,10 +30,30 @@ public class WriteTabFragment extends Fragment {
                 startWriteActivity(WriteTextActivity.class);
             }
         });
+        Button buttonAudio = rootView.findViewById(R.id.buttonaudio);
 
+        // On attribue une action quand on clique sur ce bouton ...
+        buttonAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // ... lancer l'activité grâce à une fonction créée plus bas
+                startWriteActivity(WriteAudioActivity.class);
+            }
+        });
+        Button buttonImage = rootView.findViewById(R.id.buttonimage);
+
+        // On attribue une action quand on clique sur ce bouton ...
+        buttonImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // ... lancer l'activité grâce à une fonction créée plus bas
+                startWriteActivity(WriteImageActivity.class);
+            }
+        });
         // On retourne l'objet View correspondant à tout le fragment
         return rootView;
     }
+
 
     public void startWriteActivity(final Class<? extends Activity>  activity){
         // Création d'une nouvelle intention : celle d'aller depuis cette activité vers celle donnée en argument de la fonction
