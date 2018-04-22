@@ -5,6 +5,7 @@
     <!-- Permissions et fonctionnalités de l'app : NFC et enregistrement audio -->
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -19,19 +20,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- Définition de l'activité principale : nom, thème, mode de lancement -->
+
         <activity
-            android:name=".MainActivity"
+            android:name=".NFCLinkingActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- Activité lancée en tant qu'"accueil" de l'app -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:theme="@android:style/Theme.NoDisplay"
+            android:screenOrientation="portrait">
 
             <!-- Recevra l'intention provenant d'un tag NFC formatté pour marcher avec l'application -->
             <intent-filter>
@@ -55,6 +50,23 @@
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
+
+        </activity>
+
+        <!-- Définition de l'activité principale : nom, thème -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+
+            <!-- Activité lancée en tant qu'"accueil" de l'app -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
         </activity>
 
         <!-- Définition de l'activité d'aide : nom, thème, activité parente -->
@@ -62,15 +74,25 @@
             android:name=".HelpActivity"
             android:label="@string/title_activity_help"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tagtoo.android.MainActivity" />
         </activity>
-        <activity android:name=".WriteTextActivity" />
-        <activity android:name=".WriteAudioActivity" />
-        <activity android:name=".WriteImageActivity" />
-        <activity android:name=".WriteVideoActivity"></activity>
+
+        <activity
+            android:name=".WriteTextActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".WriteAudioActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".WriteImageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".WriteVideoActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,12 +1,8 @@
 package com.tagtoo.android;
 
-import com.tagtoo.android.R;
-import android.content.SharedPreferences;
-import android.support.v4.app.FragmentTransaction;
 import android.nfc.NfcAdapter;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,10 +13,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class HomeTabFragment extends Fragment {
@@ -75,11 +67,6 @@ public class HomeTabFragment extends Fragment {
         {
             // On envoie un message à la console
             Log.i(LOG_TAG, "No NFC adapter");
-
-            //recyclerView.setVisibility(View.GONE);
-            //alerttv.setVisibility(View.VISIBLE);
-            //refresh.setVisibility(View.VISIBLE);
-            //alerttv.setText("Your device is not compatible with NFC.");
 
             // On quitte l'app avec un message d'erreur.
             Toast.makeText(getActivity(), "Your device is not compatible with NFC.", Toast.LENGTH_LONG).show();

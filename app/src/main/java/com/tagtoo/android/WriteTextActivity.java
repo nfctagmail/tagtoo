@@ -74,21 +74,6 @@ public class WriteTextActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 beamMessage();
-                try {
-                    if(myTag ==null) {
-                        Toast.makeText(context, "ERREUR", Toast.LENGTH_LONG).show();
-                    } else {
-                        write(editText.getText().toString(), myTag);
-                        Toast.makeText(context, "SUCCESS", Toast.LENGTH_LONG ).show();
-                    }
-                } catch (IOException e) {
-                    Toast.makeText(context, "ERREUR", Toast.LENGTH_LONG ).show();
-                    e.printStackTrace();
-                } catch (FormatException e) {
-                    Toast.makeText(context, "ERREUR", Toast.LENGTH_LONG ).show();
-                    e.printStackTrace();
-                }
-
             }
         });
 
@@ -137,26 +122,36 @@ public class WriteTextActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        // Si l'action de l'intention correspond à un tag NFC
-        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
 
-            // On récupère les informations du tag, contenues dans l'intention
-            myTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        // Si l'utilisateur a cliqué sur le bouton pour afficher la boîte de dialogue
+        if(getFragmentManager().findFragmentByTag("beam") != null) {
+            // Si l'action de l'intention correspond à un tag NFC
+            if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 
-            // On récupère le message écrit par l'utilisateur
-            final EditText message = findViewById(R.id.editText);
+                // On récupère les informations du tag, contenues dans l'intention
+                myTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 
-            // On essaye de lancer la fonction qui écrit sur le tag (seulement si un tag a bien été découvert)
-            try {
-                if(myTag != null){
-                    write(message.getText().toString(), myTag);
+                // On récupère le message écrit par l'utilisateur
+                final EditText message = findViewById(R.id.editText);
+
+                // On essaye de lancer la fonction qui écrit sur le tag (seulement si un tag a bien été découvert)
+                try {
+                    if (myTag != null) {
+                        write(message.getText().toString(), myTag);
+                        Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_LONG ).show();
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(context, "Erreur, tag non détécté", Toast.LENGTH_LONG).show();
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(context, "Erreur lors de la connexion", Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
+                } catch (FormatException e) {
+                    Toast.makeText(context, "Erreur dans le message que vous avez écrit", Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (FormatException e) {
-                e.printStackTrace();
             }
-
         }
     }
 

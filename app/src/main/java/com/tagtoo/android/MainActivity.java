@@ -1,8 +1,10 @@
 package com.tagtoo.android;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -53,9 +55,14 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView navigation;
 
-    private static String LOG_TAG = "MAIN_ACTIVITY";
-    private static String saved_prefs_id = "TAGTOO_SAVED_PREFS";
-    private static String saved_var_id = "TAGTOO_SAVED_MESSAGES";
+    // Les variables qui contiennent les codes pour identifier ...
+    private static String LOG_TAG = "MAIN_ACTIVITY";                // Les messages de cette activité dans les journaux
+    private static String saved_prefs_id = "TAGTOO_SAVED_PREFS";    // Retrouver les préférences dans lesquels on stocke les messages reçus
+    private static String saved_var_id = "TAGTOO_SAVED_MESSAGES";   // Retrouver la variable les contenant dans ces préférences
+
+    // La variable qui contiendra le numéro de série du tag
+    private String tagSerialNbr = null;
+    private String tagMessage = null;
 
 
     @Override
@@ -113,6 +120,43 @@ public class MainActivity extends AppCompatActivity {
                 startHelpActivity();
             }
         });
+
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                String action = intent.getAction();
+                if (navigation.getSelectedItemId() == R.id.navigation_read)
+                    if (action.equals("READ_TAG")) {
+                        tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
+                        Log.i(LOG_TAG, "TAG DATA : " + tagSerialNbr);
+                        tagMessage = intent.getStringExtra("TAG_MESSAGE");
+                        Log.i(LOG_TAG, "TAG DATA : " + tagMessage);
+
+                        // On récupère la date sous la forme d'une chaîne de caractères
+                        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+                        // On crée le message qui s'affichera sur l'accueil
+                        listMessages.add(new SavedMessage(tagMessage, currentDateTimeString));
+
+                        // On crée une nouvelle instance de HomeTabFragment
+                        HomeTabFragment homeTabFragment = new HomeTabFragment();
+
+                        // On l'ajoute à l'adapteur de la liste de l'onglet d'accueil grâce à la fonction addToAdapter utilisant la valeur de la variable listMessages étant globale
+                        homeTabFragment.addToAdapter(listMessages);
+
+                        // On change de section
+                        navigation.setSelectedItemId(R.id.navigation_home);
+
+                        // On sauvegarde les messages
+                        saveMessages(listMessages);
+
+                    }
+            }
+        };
+
+        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
+
     }
 
     public void startHelpActivity(){
@@ -196,6 +240,11 @@ public class MainActivity extends AppCompatActivity {
             }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     public <T> void saveMessages(ArrayList<T> list){
         SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);  // On récupère les préférences de l'application correspondant à l'identifiant stocké dans saved_prefs_id
         SharedPreferences.Editor mEditor = mPrefs.edit();                               // On accède à l'édition de ces préférences
@@ -208,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setFragment(Fragment fragment){
         FragmentManager fm = getSupportFragmentManager();                   // On récupère le gérant de fragment (Niveau C1 d'anglais... eh oui)
-        fm.beginTransaction().replace(R.id.content, fragment).commit();     // On fait une transaction de fragment en remplaçant celui qui est dans la partie "content" = "contenu" de la disposition poar celui donné en arguement
+        fm.beginTransaction().replace(R.id.content, fragment).commitAllowingStateLoss();     // On fait une transaction de fragment en remplaçant celui qui est dans la partie "content" = "contenu" de la disposition poar celui donné en arguement
     }
 
     // On crée l'objet SavedMessage qui detérmine toute l'information que va contenir un élément de la liste des messages

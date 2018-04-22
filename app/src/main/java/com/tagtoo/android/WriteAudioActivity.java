@@ -2,11 +2,18 @@ package com.tagtoo.android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +26,22 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public class WriteAudioActivity extends AppCompatActivity {
 
@@ -34,6 +55,10 @@ public class WriteAudioActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     // Chemin du fichier où sera enregistré le fichier audio
     private static String mFileName = null;
+
+    // La variable qui contiendra le numéro de série du tag
+    private String tagSerialNbr = null;
+    private String tagMessage = null;
 
     // Classes permettant d'enregistrer et de jouer l'audio
     private MediaRecorder mRecorder = null;
@@ -50,7 +75,8 @@ public class WriteAudioActivity extends AppCompatActivity {
 
     // Eléments de l'interface
     private ProgressBar mProgressBar;
-    private Button sendButton;
+    private TextView mSCounter;
+    private Button mSendButton;
 
     // Variable booléenne pour savoir si l'utilisateur a accepté que l'app enregistre le son, et ainsi continuer
     // NB : RECORD_AUDIO est considérée comme une permission "dangereuse"
@@ -97,7 +123,7 @@ public class WriteAudioActivity extends AppCompatActivity {
                     mPlayer = null;
                 }
                 findViewById(R.id.playButton).setEnabled(true);
-                findViewById(R.id.playButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorAccent));
+                findViewById(R.id.playButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorPrimary100));
 
             }
         });
@@ -132,10 +158,17 @@ public class WriteAudioActivity extends AppCompatActivity {
         isCountDownOver = false;
     }
 
+    @SuppressLint("NewApi")
     private void stopRecording() {
 
         // Fin de l'enregsitrement audio : enregistrement stoppé et paramètres réinitialisés
-        mRecorder.stop();
+        try{
+            mRecorder.stop();
+        }
+        catch(RuntimeException stopException){
+            Log.e(LOG_TAG, "Recorder couldn't be stopped, maybe you didn't long press the button ?");
+        }
+
         mRecorder.release();
         mRecorder = null;
 
@@ -146,16 +179,16 @@ public class WriteAudioActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 findViewById(R.id.recordButton).setClickable(true);
-                findViewById(R.id.recordButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorPrimary100));
+                findViewById(R.id.recordButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorAccent));
             }
         };
+
         findViewById(R.id.recordButton).setClickable(false);
         findViewById(R.id.recordButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorDisabled));
         mResetTimer.start();
 
         startPlaying();
     }
-
 
 
     @Override
@@ -165,37 +198,59 @@ public class WriteAudioActivity extends AppCompatActivity {
 
         WriteAudioActivity.context = getApplicationContext();
 
+        int SDK_INT = android.os.Build.VERSION.SDK_INT;
+        if (SDK_INT > 8)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            //your codes here
+
+        }
+
+        // On crée l'adresse à laquelle le fichier audio en cache sera enregistré, en récupérant l'adresse du cache attribué à l'application
         mFileName = getExternalCacheDir().getAbsolutePath();
         mFileName += "/recording_cache.3gp";
 
+        // On demande la permission d'enregistrer un fichier audio
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
+        // On récupère les objets d'affichage auxquels on veut attribuer une action (final = variable inchangeable)
         final ImageButton mRecordButton = findViewById(R.id.recordButton);
         final ImageButton mPlayButton = findViewById(R.id.playButton);
         mProgressBar = findViewById(R.id.progressBar);
-        //sendButton = findViewById(R.id.sendButton);
+        mSCounter = findViewById(R.id.scounter);
+        mSendButton = findViewById(R.id.sendButton);
+        mSendButton.setVisibility(View.GONE);
+
         final Animation recordInflateButton = AnimationUtils.loadAnimation(this, R.anim.anim_inflate_button);
         recordInflateButton.setRepeatCount(Animation.INFINITE);
 
         mProgressBar.setProgress(0);
 
-        mCountDownTimer = new CountDownTimer(15000,100) {
+        mCountDownTimer = new CountDownTimer(30000,100) {
 
             @Override
             public void onTick(long msUntilFinished) {
-                //int i = (15000 - Math.toIntExact(msUntilFinished))/150;
-                int i = (15000 - safeLongToInt(msUntilFinished))/150;
+                int i = (30000 - safeLongToInt(msUntilFinished))/300;
                 mProgressBar.setProgress(i);
+                int s = (30000 - safeLongToInt(msUntilFinished))/1000;
+                if(s < 10)
+                    mSCounter.setText("0" + s + " / 30 s");
+                else
+                    mSCounter.setText(s + " / 30 s");
+
             }
 
             @Override
             public void onFinish() {
                 mProgressBar.setProgress(100);
+                mSCounter.setText("30 / 30 s");
                 onRecord(mStartRecording);
                 mStartRecording = !mStartRecording;
                 mRecordButton.clearAnimation();
                 isCountDownOver = true;
-                sendButton.setVisibility(View.VISIBLE);
+                mSendButton.setVisibility(View.VISIBLE);
                 Log.i(LOG_TAG, "Countdown done");
             }
         };
@@ -208,7 +263,7 @@ public class WriteAudioActivity extends AppCompatActivity {
                 onRecord(mStartRecording);
                 mStartRecording = !mStartRecording;
                 mRecordButton.startAnimation(recordInflateButton);
-                //sendButton.setVisibility(View.GONE);
+                mSendButton.setVisibility(View.GONE);
                 mCountDownTimer.start();
             }
             else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -217,7 +272,7 @@ public class WriteAudioActivity extends AppCompatActivity {
                     mStartRecording = !mStartRecording;
                     mRecordButton.clearAnimation();
                     mCountDownTimer.cancel();
-                    //sendButton.setVisibility(View.VISIBLE);
+                    mSendButton.setVisibility(View.VISIBLE);
                 }
             }
             return true;
@@ -231,14 +286,96 @@ public class WriteAudioActivity extends AppCompatActivity {
                 startPlaying();
             }
         });
+
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                beamMessage();
+            }
+        });
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals("READ_TAG")) {
+                    tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
+                    Log.i(LOG_TAG, tagSerialNbr);
+                    tagMessage = intent.getStringExtra("TAG_MESSAGE");
+                    Log.i(LOG_TAG, tagMessage);
+
+                    uploadAudio(tagSerialNbr);
+
+                }
+            }
+        };
+
+        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
+
+
     }
 
-    public static int safeLongToInt(long l) {
+    public void beamMessage() {
+        // Commencer la transaction (càd la création/suppression/remplacement) de fragments d'activités
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        // S'il y a déjà  un fragment au tag égal à "beam"
+        android.app.Fragment prev = getFragmentManager().findFragmentByTag("beam");
+        //On le supprime
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        // On ajoute la transaction au "back stack" qui tient la liste des transactions pour qu'elles puissent ensuite être annulées, en appuyant par exemple sur le bouton retour
+        ft.addToBackStack(null);
+
+        // On crée une instance la boîte de dialogue que l'on veut afficher, à laquelle on envoie le texte écrit
+        DialogFragment beamDialog = BeamDialog.newInstance("audio");
+        // On affiche la boîte de dialogue, à laquelle on donne le tag "beam"
+        beamDialog.show(ft, "beam");
+    }
+
+    private static int safeLongToInt(long l) {
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException
-                    (l + "  trop grand pour être un \"int\"");
+            throw new IllegalArgumentException(l + "  trop grand pour être un \"int\"");
         }
         return (int) l;
+    }
+
+    private void uploadAudio(String serialNbr){
+
+        File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
+        File audioCache     = new File(directoryCache, "recording_cache.3gp");
+        File audioToUpload  = new File(directoryCache, serialNbr + ".3gp");
+
+        audioCache.renameTo(audioToUpload);
+
+        Log.i(LOG_TAG, "Audio Cache : "     + audioCache.toString());
+        Log.i(LOG_TAG, "Audio renamed : "   + audioToUpload.toString());
+
+        FTPClient ftp = null;
+        try{
+            ftp = new FTPClient();
+            ftp.connect(SendMessageActivity.verser);
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords.toString()))
+            {
+                ftp.enterLocalPassiveMode();
+                ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+                FileInputStream fileInput = new FileInputStream(audioToUpload);
+                boolean result = ftp.storeFile("/" + serialNbr + ".3gp", fileInput);
+                fileInput.close();
+                if(result)
+                    Log.i(LOG_TAG, "Success uploading to server");
+                ftp.logout();
+                ftp.disconnect();
+            }
+        } catch (SocketException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        } catch (UnknownHostException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        }
+
     }
 
 
