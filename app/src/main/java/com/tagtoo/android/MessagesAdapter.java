@@ -68,7 +68,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
         public void display(MainActivity.SavedMessage savedMessage){
             //currentPair = savedMessage;
             messagetw.setText(savedMessage.content);
-            info.setText(savedMessage.dateSaved);
+            info.setText(savedMessage.dateSaved + " " + savedMessage.fileName);
         }
 
         public void remove(int position){

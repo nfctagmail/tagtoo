@@ -10,6 +10,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Parcelable;
+import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -39,7 +40,16 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MainActivity.context = getApplicationContext();
+
+        int SDK_INT = android.os.Build.VERSION.SDK_INT;
+        if (SDK_INT > 8)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+
+        }
 
         // On récupère les messages enregistrés grâce à SharedPreferences
         SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);      // On récupère les préférences de l'application correspondant à l'identifiant stocké dans saved_prefs_id
@@ -137,7 +156,10 @@ public class MainActivity extends AppCompatActivity {
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
                         // On crée le message qui s'affichera sur l'accueil
-                        listMessages.add(new SavedMessage(tagMessage, currentDateTimeString));
+                        if(downloadFile(tagSerialNbr))
+                            listMessages.add(new SavedMessage(tagMessage, currentDateTimeString, tagSerialNbr + "_download.3gp"));
+                        else
+                            listMessages.add(new SavedMessage(tagMessage, currentDateTimeString));
 
                         // On crée une nouvelle instance de HomeTabFragment
                         HomeTabFragment homeTabFragment = new HomeTabFragment();
@@ -188,58 +210,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }*/
 
-    // Si l'activité reçoit une Intention
-    @Override
-    protected void onNewIntent(Intent intent)
-    {
-        super.onNewIntent(intent);
-
-        Log.i(LOG_TAG, "New intent");
-        Log.i(LOG_TAG, intent.getAction() + "");
-
-        // Si l'onglet sélectionné est celui de lecture
-        if (navigation.getSelectedItemId() == R.id.navigation_read)
-            // Si l'action de l'intention correspond à celle d'un tag NFC
-            if ((NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction()) || NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))) {
-
-                Log.i(LOG_TAG, "Tag découvert");
-
-                // On récupère le(s) message(s). Parcelable sert à envoyer des données à travers des Intents, d'activité à activité par exemple
-                Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-                // S'il y a un/des message(s)
-                if (rawMessages != null) {
-
-                    Log.i(LOG_TAG, "Tag contient un message");
-
-                    // On récupère le premier message contenu dans le Parcelable
-                    NdefMessage messages = (NdefMessage) rawMessages[0];
-
-                    // On le change en chaîne de caractères
-                    String stringMessage = new String(messages.getRecords()[0].getPayload());
-
-                    // On récupère la date sous la forme d'une chaîne de caractères
-                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
-                    // On crée le message qui s'affichera sur l'accueil
-                    listMessages.add(new SavedMessage(stringMessage, currentDateTimeString));
-
-                    // On crée une nouvelle instance de HomeTabFragment
-                    HomeTabFragment homeTabFragment = new HomeTabFragment();
-
-                    // On l'ajoute à l'adapteur de la liste de l'onglet d'accueil grâce à la fonction addToAdapter utilisant la valeur de la variable listMessages étant globale
-                    homeTabFragment.addToAdapter(listMessages);
-
-                    // On change de section
-                    navigation.setSelectedItemId(R.id.navigation_home);
-
-                    // On sauvegarde les messages
-                    saveMessages(listMessages);
-
-                }
-            }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -255,6 +225,51 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "Saving messages");
     }
 
+    private boolean downloadFile(String serialNbr){
+
+        FTPClient ftp = null;
+
+        File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
+        File audioToDownload  = new File(directoryCache, serialNbr + "_download.3gp");
+
+        try{
+            ftp = new FTPClient();
+            ftp.connect(SendMessageActivity.verser);
+
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords.toString()))
+            {
+                ftp.enterLocalPassiveMode();
+                ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+                FileOutputStream fileOutput = new FileOutputStream(audioToDownload);
+                boolean result = ftp.retrieveFile("/" + serialNbr + ".3gp", fileOutput);
+                fileOutput.close();
+                if(result) {
+                    Log.i(LOG_TAG, "Success downloading from server");
+                    ftp.logout();
+                    ftp.disconnect();
+                    return true;
+                } else {
+                    ftp.logout();
+                    ftp.disconnect();
+                    return false;
+                }
+            }
+
+        } catch (SocketException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+            return false;
+        } catch (UnknownHostException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+            return false;
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+            return false;
+        }
+        return false;
+    }
+
+
     public void setFragment(Fragment fragment){
         FragmentManager fm = getSupportFragmentManager();                   // On récupère le gérant de fragment (Niveau C1 d'anglais... eh oui)
         fm.beginTransaction().replace(R.id.content, fragment).commitAllowingStateLoss();     // On fait une transaction de fragment en remplaçant celui qui est dans la partie "content" = "contenu" de la disposition poar celui donné en arguement
@@ -265,10 +280,19 @@ public class MainActivity extends AppCompatActivity {
         public final String content;
         public final String dateSaved;
         //public final String tagName;
+        public final String fileName;
+
 
         public SavedMessage(String content, String dateSaved){
             this.content = content;
             this.dateSaved = dateSaved;
+            this.fileName = null;
+        }
+
+        public SavedMessage(String content, String dateSaved, String fileName){
+            this.content = content;
+            this.dateSaved = dateSaved;
+            this.fileName = fileName;
         }
     }
 
