@@ -62,50 +62,7 @@ public class NFCLinkingActivity extends Activity {
             finish();
         }
     }
-/*
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if (getIntent().getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED) || getIntent().getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED) || getIntent().getAction().equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
 
-            Intent newIntent = new Intent("READ_TAG");
-
-
-            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            byte[] tagId =  tag.getId();
-            String tagSerialNbr = bytesToHexString(tagId);
-            Log.i(LOG_TAG, "Tag serial number : " + tagSerialNbr);
-            String nameFileTag = "TagSN_" + tagSerialNbr;
-
-
-            newIntent.putExtra("TAG_SERIAL", nameFileTag);
-
-            // On récupère le(s) message(s). Parcelable sert à envoyer des données à travers des Intents, d'activité à activité par exemple
-            Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-            // S'il y a un/des message(s)
-            if (rawMessages != null) {
-
-                Log.i(LOG_TAG, "Tag contient un message");
-
-                // On récupère le premier message contenu dans le Parcelable
-                NdefMessage messages = (NdefMessage) rawMessages[0];
-
-                // On le change en chaîne de caractères
-                String stringMessage = new String(messages.getRecords()[0].getPayload());
-
-                newIntent.putExtra("TAG_MESSAGE", stringMessage);
-
-            }
-            sendBroadcast(newIntent);
-
-            finish();
-        }
-        else {
-            finish();
-        }
-    }
-*/
     private String bytesToHexString(byte[] src) {
         // On va créer une chaine de caractères à laquelle on ajoutera au fur et à mesure des caractères. Elle commence par "0x"
         StringBuilder stringBuilder = new StringBuilder("0x");
