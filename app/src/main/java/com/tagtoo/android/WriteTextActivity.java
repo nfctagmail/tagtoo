@@ -100,7 +100,7 @@ public class WriteTextActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.editText);
         // On crée une instance la boîte de dialogue que l'on veut afficher, à laquelle on envoie le texte écrit
-        DialogFragment beamDialog = BeamDialog.newInstance(editText.getText().toString());
+        DialogFragment beamDialog = BeamDialog.newInstance("Votre message texte : " + editText.getText().toString());
         // On affiche la boîte de dialogue, à laquelle on donne le tag "beam"
         beamDialog.show(ft, "beam");
     }

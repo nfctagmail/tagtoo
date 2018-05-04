@@ -6,11 +6,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNdefMessageCallback
 {
 
-    String mMessage;
+    String message;
 
     static BeamDialog newInstance(String message) {
 
@@ -34,12 +35,18 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
         setRetainInstance(true);
         // On choisit le style : normal et clair
         setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog);
+
+        message = getArguments().getString("message");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View v = inflater.inflate(R.layout.dialog_beam_message, container, false);
+
+        TextView msgTextView = v.findViewById(R.id.message);
+
+        msgTextView.setText("Votre message : " + message);
 
         return v;
     }

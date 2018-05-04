@@ -326,7 +326,7 @@ public class WriteAudioActivity extends AppCompatActivity {
         ft.addToBackStack(null);
 
         // On crée une instance la boîte de dialogue que l'on veut afficher, à laquelle on envoie le texte écrit
-        DialogFragment beamDialog = BeamDialog.newInstance("audio");
+        DialogFragment beamDialog = BeamDialog.newInstance("Message audio");
         // On affiche la boîte de dialogue, à laquelle on donne le tag "beam"
         beamDialog.show(ft, "beam");
     }
