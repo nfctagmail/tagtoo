@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -76,7 +77,7 @@ public class WriteAudioActivity extends AppCompatActivity {
     // Eléments de l'interface
     private ProgressBar mProgressBar;
     private TextView mSCounter;
-    private Button mSendButton;
+    private FloatingActionButton mSendButton;
 
     // Variable booléenne pour savoir si l'utilisateur a accepté que l'app enregistre le son, et ainsi continuer
     // NB : RECORD_AUDIO est considérée comme une permission "dangereuse"
@@ -198,13 +199,8 @@ public class WriteAudioActivity extends AppCompatActivity {
 
         WriteAudioActivity.context = getApplicationContext();
 
-        int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        if (SDK_INT > 8)
-        {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         // On crée l'adresse à laquelle le fichier audio en cache sera enregistré, en récupérant l'adresse du cache attribué à l'application
         mFileName = getExternalCacheDir().getAbsolutePath();
@@ -353,8 +349,13 @@ public class WriteAudioActivity extends AppCompatActivity {
         try{
             ftp = new FTPClient();
             ftp.connect(SendMessageActivity.verser);
-            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords.toString()))
+
+            Log.i(LOG_TAG, "Trying to connect to the server");
+
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords))
             {
+                Log.i(LOG_TAG, "Connection to the server successful");
+
                 ftp.enterLocalPassiveMode();
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
@@ -366,6 +367,8 @@ public class WriteAudioActivity extends AppCompatActivity {
                 ftp.logout();
                 ftp.disconnect();
             }
+            else
+                Log.e(LOG_TAG, "Could not connect to server");
         } catch (SocketException e) {
             Log.e(LOG_TAG, e.getStackTrace().toString());
         } catch (UnknownHostException e) {

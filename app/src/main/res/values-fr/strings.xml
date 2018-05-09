@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tagtoo</string>
-    <string name="tab_text_1">Accueil</string>
-    <string name="tab_text_2">Lire</string>
-    <string name="tab_text_3">Ecrire</string>
     <string name="action_settings">Paramètres</string>
     <string name="section_format">Hello World depuis la section: %1$d</string>
     <string name="title_activity_help">Aide</string>
+    <string name="title_home">Accueil</string>
+    <string name="title_read">Lire</string>
+    <string name="title_write">Écrire</string>
+    <string name="button_text">Texte</string>
+    <string name="button_audio">Audio</string>
+    <string name="button_video">Vidéo</string>
+    <string name="button_image">Image</string>
+    <string name="nfc_disabled">Le NFC est désactivé dans vos paramètres. Activez-le pour pouvoir utiliser cette app.</string>
+    <string name="list_empty">Vous n\'avez aucun message NFC sauvegardé, tappez le bouton Aide au bas de votre écran pour savoir comment en lire et en écrire.</string>
+    <string name="play_button">Bouton de lecture</string>
+    <string name="section_title_write">Choissisez le type de message que vous voulez mettre sur le tag.</string>
+    <string name="info_record_audio">Restez appué sur le bouton d\'enregistrement pour enregistrer un son de moins de 30 secondes.</string>
+    <string name="info_write_text">Écrivez votre texte ci-dessous. Il ne peut pas faire plus de 100 caractères.</string>
+    <string name="info_read">Mettez votre téléphone contre le tag que vous voulez lire.</string>
+    <string name="msg_title_text">"Message texte NFC : "</string>
+    <string name="msg_title_audio">Message audio NFC :</string>
+    <string name="title_msg_default">"Ce tag NFC contient : "</string>
+    <string name="title_msg_params">"Tag NFC %1$s, scanné au %2$s"</string>
 </resources>

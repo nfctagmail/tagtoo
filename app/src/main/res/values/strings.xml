@@ -1,19 +1,24 @@
 <resources>
-    <string name="app_name">Tagtoo</string>
-    <string name="tab_text_1">Home</string>
-    <string name="tab_text_2">Read</string>
-    <string name="tab_text_3">Write</string>
+    <string name="app_name" translatable="false">Tagtoo</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_help">Help</string>
-    <string name="title_activity_test_bottom_nav">TestBottomNav</string>
     <string name="title_home">Home</string>
     <string name="title_read">Read</string>
     <string name="title_write">Write</string>
-    <string name="button_text">Texte</string>
+    <string name="button_text">Text</string>
     <string name="button_audio">Audio</string>
     <string name="button_video">Video</string>
-    <string name="button_image">Image</string>
+    <string name="button_image">Picture</string>
     <string name="nfc_disabled">NFC is disabled in the Settings. Activate it to be able to use this app.</string>
     <string name="list_empty">You have no saved NFC messages, tap the help button at the bottom of your screen to know how to add one.</string>
+    <string name="play_button">Play Button</string>
+    <string name="section_title_write">Choose the kind of message you want to put on the NFC tag.</string>
+    <string name="info_record_audio">Long press the record button to record. Your message can\'t be longer than 30 seconds.</string>
+    <string name="info_write_text">Write your text in the box below, it can\'t be more than 100 characters.</string>
+    <string name="info_read">Put your phone against the tag you want to read.</string>
+    <string name="msg_title_text">NFC text message :</string>
+    <string name="msg_title_audio">NFC audio message :</string>
+    <string name="title_msg_default">This NFC tag contains :</string>
+    <string name="title_msg_params">"Tag NFC %1$s, scanned on %2$s"</string>
 </resources>

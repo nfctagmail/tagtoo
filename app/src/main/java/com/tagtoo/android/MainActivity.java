@@ -1,11 +1,13 @@
 package com.tagtoo.android;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Build;
@@ -82,14 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         MainActivity.context = getApplicationContext();
 
-        int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        if (SDK_INT > 8)
-        {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-
-        }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         // On récupère les messages enregistrés grâce à SharedPreferences
         SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);      // On récupère les préférences de l'application correspondant à l'identifiant stocké dans saved_prefs_id
@@ -155,11 +151,14 @@ public class MainActivity extends AppCompatActivity {
                         // On récupère la date sous la forme d'une chaîne de caractères
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
+                        // Et sous forme de secondes, pour donner un nom unique au fichier téléchargé, pour que pour un même tag on ait différent fichiers audio à chaque téléchargement
+                        Long time = System.currentTimeMillis()/1000;
+                        String timeString = time.toString();
                         // On crée le message qui s'affichera sur l'accueil
-                        if(downloadFile(tagSerialNbr))
-                            listMessages.add(new SavedMessage(tagMessage, currentDateTimeString, tagSerialNbr + "_download.3gp"));
+                        if(downloadFile(tagSerialNbr, timeString))
+                            listMessages.add(new SavedMessage(tagMessage, tagSerialNbr, currentDateTimeString, tagSerialNbr + "_download" + time + ".3gp"));
                         else
-                            listMessages.add(new SavedMessage(tagMessage, currentDateTimeString));
+                            listMessages.add(new SavedMessage(tagMessage, tagSerialNbr, currentDateTimeString));
 
                         // On crée une nouvelle instance de HomeTabFragment
                         HomeTabFragment homeTabFragment = new HomeTabFragment();
@@ -186,35 +185,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /*
-    Fonctions pour créer un menu en haut à droite, dans la barre d'outils
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
     public <T> void saveMessages(ArrayList<T> list){
         SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);  // On récupère les préférences de l'application correspondant à l'identifiant stocké dans saved_prefs_id
         SharedPreferences.Editor mEditor = mPrefs.edit();                               // On accède à l'édition de ces préférences
@@ -225,19 +195,23 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "Saving messages");
     }
 
-    private boolean downloadFile(String serialNbr){
+    private boolean downloadFile(String serialNbr, String time){
 
         FTPClient ftp = null;
 
         File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
-        File audioToDownload  = new File(directoryCache, serialNbr + "_download.3gp");
+        File audioToDownload  = new File(directoryCache, serialNbr + "_download" + time + ".3gp");
 
         try{
             ftp = new FTPClient();
             ftp.connect(SendMessageActivity.verser);
 
-            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords.toString()))
+            Log.i(LOG_TAG, "Trying to connect to the server");
+
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords))
             {
+                Log.i(LOG_TAG, "Connection to the server successful");
+
                 ftp.enterLocalPassiveMode();
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
@@ -254,8 +228,10 @@ public class MainActivity extends AppCompatActivity {
                     ftp.disconnect();
                     return false;
                 }
-            }
 
+            }
+            else
+                Log.e(LOG_TAG, "Could not connect to server");
         } catch (SocketException e) {
             Log.e(LOG_TAG, e.getStackTrace().toString());
             return false;
@@ -278,19 +254,21 @@ public class MainActivity extends AppCompatActivity {
     // On crée l'objet SavedMessage qui detérmine toute l'information que va contenir un élément de la liste des messages
     public class SavedMessage {
         public final String content;
+        public final String serialNbr;
         public final String dateSaved;
-        //public final String tagName;
         public final String fileName;
 
 
-        public SavedMessage(String content, String dateSaved){
+        public SavedMessage(String content, String serialNbr, String dateSaved){
             this.content = content;
+            this.serialNbr = serialNbr;
             this.dateSaved = dateSaved;
             this.fileName = null;
         }
 
-        public SavedMessage(String content, String dateSaved, String fileName){
+        public SavedMessage(String content, String serialNbr, String dateSaved, String fileName){
             this.content = content;
+            this.serialNbr = serialNbr;
             this.dateSaved = dateSaved;
             this.fileName = fileName;
         }
