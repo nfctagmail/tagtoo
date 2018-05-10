@@ -21,4 +21,15 @@
     <string name="msg_title_audio">NFC audio message :</string>
     <string name="title_msg_default">This NFC tag contains :</string>
     <string name="title_msg_params">"Tag NFC %1$s, scanned on %2$s"</string>
+    <string name="delete_audio_desc">Are you sure you want to permanentely delete this recording from this tag ?</string>
+    <string name="delete_audio_title">Delete this audio recording ?</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="success_write_text">Message successfully written to this tag !</string>
+    <string name="error_write_text_tag">Error : tag was not detected properly. Try again.</string>
+    <string name="error_write_text_io">Error : there was an error connecting ot the tag. Try again.</string>
+    <string name="error_write_text_format">Error : your text might have unnacepted characters or is too long.</string>
+    <string name="success_write_audio">Recording successfully associated to tag !</string>
+    <string name="error_write_audio_server">Connection to the server unsuccessful. Make sure you\'re connected and try again.</string>
+    <string name="error_write_audio_connection">Connection error.</string>
 </resources>

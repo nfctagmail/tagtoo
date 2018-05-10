@@ -19,7 +19,7 @@ public class HomeTabFragment extends Fragment {
 
     private static NfcAdapter mNfcAdapter;
 
-    private static ArrayList<MainActivity.SavedMessage> listMessages = new ArrayList<>();
+    private static ArrayList<SavedMessage> listMessages = new ArrayList<>();
 
     private static String LOG_TAG = "TAB_HOME";
     private static String saved_prefs_id = "TAGTOO_SAVED_PREFS";
@@ -103,7 +103,7 @@ public class HomeTabFragment extends Fragment {
         return rootView;
     }
 
-    public void addToAdapter(ArrayList<MainActivity.SavedMessage> list){
+    public void addToAdapter(ArrayList<SavedMessage> list){
         listMessages    = list;                                                 // la liste propre à ce fragment devient celle renseignée en argument
         messagesAdapter = new MessagesAdapter(getActivity(), listMessages);     // On crée une nouvelle instance de l'adaptateur des messages de la liste auquel on donne ces messages
         messagesAdapter.setMessages(listMessages);                              // On donne la liste des messages

@@ -1,40 +1,55 @@
 package com.tagtoo.android;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 
 public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.MessageViewHolder> {
 
-    private Context mContext;
+    private static Context mContext;
 
-    private ArrayList<MainActivity.SavedMessage> messages;
+    private ArrayList<SavedMessage> messages;
 
-    public MessagesAdapter(Context context, ArrayList<MainActivity.SavedMessage> list){
+    private String LOG_TAG = "MESSAGES";
+
+    public MessagesAdapter(Context context, ArrayList<SavedMessage> list){
         this.mContext = context;
         messages = list;
     }
 
-    public void setMessages(ArrayList<MainActivity.SavedMessage> list){
+    public void setMessages(ArrayList<SavedMessage> list){
         this.messages = list;
     }
 
@@ -45,9 +60,100 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
     }
 
     @Override
-    public void onBindViewHolder(MessagesAdapter.MessageViewHolder holder, int position) {
+    public void onBindViewHolder(MessagesAdapter.MessageViewHolder holder, final int position) {
+        final SavedMessage item = messages.get(position);
+
         holder.display(messages.get(position));
+        final SavedMessage newMessage = new SavedMessage(item.content, item.serialNbr, item.dateSaved);
+
+        if(item.fileName != null) {
+            holder.audioPlayer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setTitle(R.string.delete_audio_title);
+                    builder.setMessage(R.string.delete_audio_desc);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if(deleteFile(item.fileName, item.serialNbr)){
+                                messages.set(position, newMessage);
+                                if(mContext instanceof MainActivity) {                                  // Si on est dans le contexte de l'activité principale
+                                    ((MainActivity) mContext).saveMessages(messages);                   // On appelle ses fonctions pour sauvegarder les messages ...
+                                    ((MainActivity) mContext).setFragment(new HomeTabFragment());       // ... et actualiser le fragment
+                                }
+                            }
+
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+                    AlertDialog dialogDelete = builder.create();
+                    dialogDelete.show();
+
+                    return true;
+                }
+            });
+        }
     }
+
+    private boolean deleteFile(String fileToDelete, String serialNumber){
+
+        FTPClient ftp = null;
+
+        File directoryCache = new File(mContext.getExternalCacheDir().getAbsolutePath());
+        File audioToDelete  = new File(directoryCache, fileToDelete);
+
+        Log.i(LOG_TAG, audioToDelete.getAbsolutePath());
+        Log.i(LOG_TAG, "/" + serialNumber + ".3gp");
+
+        try{
+            ftp = new FTPClient();
+            ftp.connect(SendMessageActivity.verser);
+
+            Log.i(LOG_TAG, "Trying to connect to the server.");
+
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords))
+            {
+                Log.i(LOG_TAG, "Connection to the server successful.");
+
+                ftp.enterLocalPassiveMode();
+
+                if(ftp.deleteFile("/" + serialNumber + ".3gp")) {
+                    Log.i(LOG_TAG, "Deleting file from server successfully.");
+                    if(audioToDelete.delete()) {
+                        Log.i(LOG_TAG, "Deleting file from phone successfully.");
+                        ftp.logout();
+                        ftp.disconnect();
+                        return true;
+                    } else
+                        Log.e(LOG_TAG, "Could not delete file from phone. You can always clean the cache manually.");
+                }
+                else
+                    Log.e(LOG_TAG, "Could not delete file from server.");
+
+                ftp.logout();
+                ftp.disconnect();
+            }
+            else
+                Log.e(LOG_TAG, "Could not connect to server");
+        } catch (SocketException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        } catch (UnknownHostException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getStackTrace().toString());
+        }
+
+        return false;
+    }
+
+
 
     @Override
     public int getItemCount() {
@@ -58,7 +164,8 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
 
         private final TextView title;
         private final TextView messagetw;
-        private final TextView info;
+        private final TextView titleAudio;
+        private final LinearLayout audioPlayer;
         private final ImageButton deleteButton;
         private final ImageButton playButton;
         private final ProgressBar progressBar;
@@ -77,7 +184,8 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
             super(itemView);
             title        = itemView.findViewById(R.id.msgTitle);
             messagetw    = itemView.findViewById(R.id.message);
-            info         = itemView.findViewById(R.id.info);
+            titleAudio   = itemView.findViewById(R.id.audioMsgTitle);
+            audioPlayer  = itemView.findViewById(R.id.audioPlayer);
             deleteButton = itemView.findViewById(R.id.deleteButton);
             playButton   = itemView.findViewById(R.id.playButton);
             progressBar  = itemView.findViewById(R.id.recordingProgressBar);
@@ -113,10 +221,10 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                     }
                 };
             }
-
         }
 
-        public void display(MainActivity.SavedMessage savedMessage){
+
+        public void display(SavedMessage savedMessage){
 
             if(savedMessage.serialNbr != null){
                 String formatSerialNbr = savedMessage.serialNbr;
@@ -126,8 +234,8 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                 title.setText(textTitle);
             }
             messagetw.setText(savedMessage.content);
-            info.setText(savedMessage.dateSaved);
             if(savedMessage.fileName == null) {
+                titleAudio.setVisibility(View.GONE);
                 playButton.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 counter.setVisibility(View.GONE);
@@ -179,7 +287,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                                 }
 
                             } catch (InterruptedException e){
-                                Log.e("MESSAGES", e.getMessage(), e);
+                                Log.e(LOG_TAG, e.getMessage(), e);
                             }
 
                         }
@@ -188,7 +296,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                 }
 
             } catch (IOException e) {
-                Log.e("MESSAGES", "Preparing audio player failed : maybe file doesn't exist.");
+                Log.e(LOG_TAG, "Preparing audio player failed : maybe file doesn't exist.");
             }
 
             // Désactiver le bouton Play
@@ -219,6 +327,5 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
         }
 
     }
-
 
 }

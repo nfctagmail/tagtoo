@@ -1,43 +1,24 @@
 package com.tagtoo.android;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
-import android.nfc.NdefMessage;
-import android.nfc.NfcAdapter;
-import android.os.Build;
-import android.os.Parcelable;
 import android.os.StrictMode;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -46,7 +27,6 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -54,9 +34,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -249,29 +227,6 @@ public class MainActivity extends AppCompatActivity {
     public void setFragment(Fragment fragment){
         FragmentManager fm = getSupportFragmentManager();                   // On récupère le gérant de fragment (Niveau C1 d'anglais... eh oui)
         fm.beginTransaction().replace(R.id.content, fragment).commitAllowingStateLoss();     // On fait une transaction de fragment en remplaçant celui qui est dans la partie "content" = "contenu" de la disposition poar celui donné en arguement
-    }
-
-    // On crée l'objet SavedMessage qui detérmine toute l'information que va contenir un élément de la liste des messages
-    public class SavedMessage {
-        public final String content;
-        public final String serialNbr;
-        public final String dateSaved;
-        public final String fileName;
-
-
-        public SavedMessage(String content, String serialNbr, String dateSaved){
-            this.content = content;
-            this.serialNbr = serialNbr;
-            this.dateSaved = dateSaved;
-            this.fileName = null;
-        }
-
-        public SavedMessage(String content, String serialNbr, String dateSaved, String fileName){
-            this.content = content;
-            this.serialNbr = serialNbr;
-            this.dateSaved = dateSaved;
-            this.fileName = fileName;
-        }
     }
 
 }

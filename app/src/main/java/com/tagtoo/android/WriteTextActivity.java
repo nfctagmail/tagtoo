@@ -138,17 +138,17 @@ public class WriteTextActivity extends AppCompatActivity {
                 try {
                     if (myTag != null) {
                         write(message.getText().toString(), myTag);
-                        Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_LONG ).show();
+                        Toast.makeText(context, R.string.success_write_text, Toast.LENGTH_LONG).show();
                         finish();
                     }
                     else {
-                        Toast.makeText(context, "Erreur, tag non détécté", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, R.string.error_write_text_tag, Toast.LENGTH_LONG).show();
                     }
                 } catch (IOException e) {
-                    Toast.makeText(context, "Erreur lors de la connexion", Toast.LENGTH_LONG ).show();
+                    Toast.makeText(context, R.string.error_write_text_io, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } catch (FormatException e) {
-                    Toast.makeText(context, "Erreur dans le message que vous avez écrit", Toast.LENGTH_LONG ).show();
+                    Toast.makeText(context, R.string.error_write_text_format, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }

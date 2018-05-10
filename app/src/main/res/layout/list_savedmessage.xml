@@ -16,11 +16,11 @@
         android:id="@+id/msgTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/deleteButton"
-        android:text="@string/title_msg_default" />
+        android:text="@string/title_msg_default"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/textMsgTitle"
@@ -41,18 +41,6 @@
         android:text="Message"
         android:textSize="18sp" />
 
-    <!--android:layout_alignParentStart="true"
-    android:layout_alignParentTop="true"-->
-
-    <TextView
-        android:id="@+id/info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/message"
-        android:text="Info"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        />
-
     <ImageButton
         android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
@@ -68,19 +56,20 @@
         android:id="@+id/audioMsgTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/info"
+        android:layout_below="@+id/message"
         android:layout_marginTop="8dp"
         android:text="@string/msg_title_audio"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
+        android:id="@+id/audioPlayer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/audioMsgTitle"
-        android:orientation="horizontal"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="8dp"
+        android:orientation="horizontal"
         android:weightSum="10">
 
         <ImageButton

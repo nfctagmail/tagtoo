@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -24,10 +23,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -35,13 +34,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 public class WriteAudioActivity extends AppCompatActivity {
@@ -226,9 +220,9 @@ public class WriteAudioActivity extends AppCompatActivity {
 
             @Override
             public void onTick(long msUntilFinished) {
-                int i = (30000 - safeLongToInt(msUntilFinished))/300;
+                int i = (30000 - (int)msUntilFinished)/300;
                 mProgressBar.setProgress(i);
-                int s = (30000 - safeLongToInt(msUntilFinished))/1000;
+                int s = (30000 - (int)msUntilFinished)/1000;
                 if(s < 10)
                     mSCounter.setText("0" + s + " / 30 s");
                 else
@@ -250,29 +244,28 @@ public class WriteAudioActivity extends AppCompatActivity {
         };
 
         mRecordButton.setOnTouchListener(new View.OnTouchListener() {
-             @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN && mStartRecording) {
-                view.performClick();
-                onRecord(mStartRecording);
-                mStartRecording = !mStartRecording;
-                mRecordButton.startAnimation(recordInflateButton);
-                mSendButton.setVisibility(View.GONE);
-                mCountDownTimer.start();
-            }
-            else if (event.getAction() == MotionEvent.ACTION_UP) {
-                if(!isCountDownOver) {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN && mStartRecording) {
+                    view.performClick();
                     onRecord(mStartRecording);
                     mStartRecording = !mStartRecording;
-                    mRecordButton.clearAnimation();
-                    mCountDownTimer.cancel();
-                    mSendButton.setVisibility(View.VISIBLE);
+                    mRecordButton.startAnimation(recordInflateButton);
+                    mSendButton.setVisibility(View.GONE);
+                    mCountDownTimer.start();
                 }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if(!isCountDownOver) {
+                        onRecord(mStartRecording);
+                        mStartRecording = !mStartRecording;
+                        mRecordButton.clearAnimation();
+                        mCountDownTimer.cancel();
+                        mSendButton.setVisibility(View.VISIBLE);
+                    }
+                }
+                return true;
             }
-            return true;
-        }
-    }
-        );
+        });
 
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,20 +285,24 @@ public class WriteAudioActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 String action = intent.getAction();
-                if (action.equals("READ_TAG")) {
+                if(action.equals("READ_TAG")) {
                     tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
                     Log.i(LOG_TAG, tagSerialNbr);
                     tagMessage = intent.getStringExtra("TAG_MESSAGE");
                     Log.i(LOG_TAG, tagMessage);
 
-                    uploadAudio(tagSerialNbr);
+                    if(uploadAudio(tagSerialNbr)) {
+                        Toast.makeText(context, R.string.success_write_audio, Toast.LENGTH_LONG).show();
+                        unregisterReceiver(this);
+                        finish();
+                    } else
+                        Toast.makeText(context, R.string.error_write_audio_server, Toast.LENGTH_LONG).show();
 
                 }
             }
         };
 
         registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
-
 
     }
 
@@ -327,14 +324,7 @@ public class WriteAudioActivity extends AppCompatActivity {
         beamDialog.show(ft, "beam");
     }
 
-    private static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(l + "  trop grand pour être un \"int\"");
-        }
-        return (int) l;
-    }
-
-    private void uploadAudio(String serialNbr){
+    private boolean uploadAudio(String serialNbr) {
 
         File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
         File audioCache     = new File(directoryCache, "recording_cache.3gp");
@@ -346,7 +336,7 @@ public class WriteAudioActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "Audio renamed : "   + audioToUpload.toString());
 
         FTPClient ftp = null;
-        try{
+        try {
             ftp = new FTPClient();
             ftp.connect(SendMessageActivity.verser);
 
@@ -362,13 +352,17 @@ public class WriteAudioActivity extends AppCompatActivity {
                 FileInputStream fileInput = new FileInputStream(audioToUpload);
                 boolean result = ftp.storeFile("/" + serialNbr + ".3gp", fileInput);
                 fileInput.close();
-                if(result)
-                    Log.i(LOG_TAG, "Success uploading to server");
                 ftp.logout();
                 ftp.disconnect();
+                if(result) {
+                    Log.i(LOG_TAG, "Success uploading to server");
+                    return true;
+                }
             }
-            else
+            else {
                 Log.e(LOG_TAG, "Could not connect to server");
+                return false;
+            }
         } catch (SocketException e) {
             Log.e(LOG_TAG, e.getStackTrace().toString());
         } catch (UnknownHostException e) {
@@ -376,7 +370,7 @@ public class WriteAudioActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getStackTrace().toString());
         }
-
+        return false;
     }
 
 

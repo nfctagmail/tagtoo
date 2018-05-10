@@ -21,4 +21,15 @@
     <string name="msg_title_audio">Message audio NFC :</string>
     <string name="title_msg_default">"Ce tag NFC contient : "</string>
     <string name="title_msg_params">"Tag NFC %1$s, scanné au %2$s"</string>
+    <string name="delete_audio_desc">Êtes-vous sûr de vouloir supprimer de manière permanente cet enregistrement audio de ce tag ?</string>
+    <string name="delete_audio_title">Supprimer l\'enregistrement audio ?</string>
+    <string name="cancel">Annuler</string>
+    <string name="yes">Oui</string>
+    <string name="success_write_text">Message écrit avec succès !</string>
+    <string name="error_write_text_tag">Erreur, tag non détécté. Réessayez.</string>
+    <string name="error_write_text_io">Erreur lors de la connexion au tag. Réessayez.</string>
+    <string name="error_write_text_format">Erreur dans le message : votre message contient peut-être des caractères interdits ou est trop long.</string>
+    <string name="success_write_audio">Enregistrement audio associé au tag avec succès !</string>
+    <string name="error_write_audio_server">Connexion au serveur sans succès. Soyez sûr d\'être connecté et réessayez.</string>
+    <string name="error_write_audio_connection">Erreur de connexion.</string>
 </resources>
