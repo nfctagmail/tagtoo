@@ -32,4 +32,13 @@
     <string name="success_write_audio">Enregistrement audio associé au tag avec succès !</string>
     <string name="error_write_audio_server">Connexion au serveur sans succès. Soyez sûr d\'être connecté et réessayez.</string>
     <string name="error_write_audio_connection">Erreur de connexion.</string>
+    <string name="section_help_tag">Qu\'est-ce qu\'un tag NFC ?</string>
+    <string name="section_help_write">Comment écrire sur un tag ?</string>
+    <string name="section_help_read">Comment lire le message d\'un tag ?</string>
+    <string name="section_help_home">Gérer les message que l\'on a lu</string>
+    <string name="section_help_desc_tag">Un tag NFC est un petit bout de carton avec lequel votre téléphone peut communiquer en utilisant cette app. Cette app vous permet de laisser n\'importe qui la possèdant ajouter tout types de messages sur ce tag, texte ou audio (plus tard vidéos et images).</string>
+    <string name="section_help_desc_write">"Vous pouvez donc soit écrire des messages textes directement sur le tag (hors-connexion), ou enregistrer un message audio envoyé sur notre serveur et lié à ce tag. Accédez à cette fonctionnalité grâce à l'icône \"Lire\" dans la barre de navigation. "</string>
+    <string name="section_help_desc_read">Dans l\'onglet \"Lire\" de cette app, mettez votre téléphone contre le tag pour accéder à son contenu. Il sera ajouté à la liste de tous ceux que vous avez lu sur l\'onglet \"Accueil\".</string>
+    <string name="section_help_desc_home">Dans l\'onglet \"Accueil\", vous pouvez faire défiler tous les messages que vous avez lus et aussi jouer les messages audio qui sont venus avec. Vous pouvez supprimer de manière permanente le fichier audio en restant appuyé sur le lecteur audio.</string>
+    <string name="button_end">Terminer</string>
 </resources>

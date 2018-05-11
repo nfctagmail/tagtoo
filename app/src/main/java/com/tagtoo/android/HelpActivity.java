@@ -1,9 +1,6 @@
 package com.tagtoo.android;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,27 +8,21 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.TextView;
 
 public class HelpActivity extends AppCompatActivity {
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * PagerAdapter fournit un fragment pour chaque page (dérivé de FragmentPagerAdapter sauf qu'il garde tous les fragments en mémoire)
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
-     * The {@link ViewPager} that will host the section contents.
+     * ViewPager gère le contenu de chaque section (page), représente l'ensemble des pages, contrairement au PagerAdapter.
      */
     private ViewPager mViewPager;
 
@@ -40,57 +31,32 @@ public class HelpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        // Initialisation de l'daptateur qui va gérer chaque fragment, l'assigner à une page
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        // Initialisation de ViewPager avec le PagerAdapter.
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_help, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
-     * A placeholder fragment containing a simple view.
+     * Un fragment contenant
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class HelpFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
+        public HelpFragment() {
         }
 
         /**
-         * Returns a new instance of this fragment for the given section
-         * number.
+         * Quand on crée une nouvelle instance de ce fragment, on obtient aussi le numéro de la page
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static HelpFragment newInstance(int sectionNumber) {
+            HelpFragment fragment = new HelpFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
@@ -100,15 +66,49 @@ public class HelpActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_help, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            int currentPage = getArguments().getInt(ARG_SECTION_NUMBER);
+            TextView title = rootView.findViewById(R.id.section_title);
+            TextView desc = rootView.findViewById(R.id.section_desc);
+            Button endButton = rootView.findViewById(R.id.button_end);
+            endButton.setVisibility(View.GONE);
+            switch (currentPage){
+                case 1:
+                    title.setText(R.string.section_help_tag);
+                    desc.setText(R.string.section_help_desc_tag);
+                    break;
+                case 2:
+                    title.setText(R.string.section_help_write);
+                    desc.setText(R.string.section_help_desc_write);
+                    break;
+                case 3:
+                    title.setText(R.string.section_help_read);
+                    desc.setText(R.string.section_help_desc_read);
+                    break;
+                case 4:
+                    title.setText(R.string.section_help_home);
+                    desc.setText(R.string.section_help_desc_home);
+                    endButton.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    title.setText("There was a problem.");
+                    desc.setText("There was a problem.");
+                    break;
+            }
+
+            endButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getActivity().finish();
+                }
+            });
+
+
             return rootView;
         }
     }
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * SectionsPagerAdapter renvoie un fragment selon la page
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -118,15 +118,14 @@ public class HelpActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            // Quand ViewPager veut savoir quel Fragment (item) on renvoie une nouvelle instance de PLaceholderFragment avecle numéro de la page (0+1, 1+1 ou 2+1; page 1, 2, ou 3)
+            return HelpFragment.newInstance(position + 1);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            // Nombre total de pages à afficher.
+            return 4;
         }
     }
 }

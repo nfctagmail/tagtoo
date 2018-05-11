@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             if(gsonMessages != null)                                                        // Si cette version temporaire de la liste n'est pas nulle
                 listMessages = gsonMessages;                                                // On donne sa valeur à la véritable liste.
 
+
         // On attribue chaque fragment à chaque option de la barre de navigation
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                         Long time = System.currentTimeMillis()/1000;
                         String timeString = time.toString();
                         // On crée le message qui s'affichera sur l'accueil
-                        if(downloadFile(tagSerialNbr, timeString))
+                        if (downloadFile(tagSerialNbr, timeString))
                             listMessages.add(new SavedMessage(tagMessage, tagSerialNbr, currentDateTimeString, tagSerialNbr + "_download" + time + ".3gp"));
                         else
                             listMessages.add(new SavedMessage(tagMessage, tagSerialNbr, currentDateTimeString));

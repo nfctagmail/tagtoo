@@ -1,6 +1,7 @@
 package com.tagtoo.android;
 
 import android.nfc.NfcAdapter;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,7 +41,7 @@ public class HomeTabFragment extends Fragment {
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         TextView alerttv          = rootView.findViewById(R.id.alertTextView);
         Button refresh            = rootView.findViewById(R.id.refreshButton);
-
+        final FloatingActionButton fab  = getActivity().findViewById(R.id.fab);
 
         // Si la variable contenant la liste
         if(!listMessages.isEmpty()) {
@@ -72,9 +73,8 @@ public class HomeTabFragment extends Fragment {
             Toast.makeText(getActivity(), "Your device is not compatible with NFC.", Toast.LENGTH_LONG).show();
             getActivity().finish();
         }
-
         // Si le nfc est désactivé
-        else if( !mNfcAdapter.isEnabled())
+        else if(!mNfcAdapter.isEnabled())
         {
             Log.i(LOG_TAG, "NFC is disabled");
 
@@ -82,11 +82,13 @@ public class HomeTabFragment extends Fragment {
             alerttv.setVisibility(View.VISIBLE);    // On affiche le texte d'alerte
             alerttv.setText(R.string.nfc_disabled); // Le texte affiche qu'il est désactivé
             refresh.setVisibility(View.VISIBLE);    // Un bouton "Rafraichir" apparait pour actualiser l'app si le NFC est activé
+            fab.setVisibility(View.VISIBLE);
         }
         else if(listMessages.isEmpty())
         {
             alerttv.setVisibility(View.VISIBLE);    // On affiche le texte d'alerte
             alerttv.setText(R.string.list_empty);   // On affiche le texte par défaut
+            fab.setVisibility(View.VISIBLE);
         }
 
         // Action du bouton "Rafraichir"
@@ -95,6 +97,20 @@ public class HomeTabFragment extends Fragment {
             public void onClick(View view) {
                 getActivity().finish();                     // On arrête l'activité
                 startActivity(getActivity().getIntent());   // On démarre l'activité
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                // On fait glisser la liste vers le bas (dy positif) : on cache le bouton d'aide
+                if (dy > 0 && fab.getVisibility() == View.VISIBLE) {
+                    fab.hide();
+                }
+                // On fait glisser la liste vers le haut (dy négatif) : on affiche le bouton d'aide
+                else if (dy < 0 && fab.getVisibility() != View.VISIBLE) {
+                    fab.show();
+                }
             }
         });
 
