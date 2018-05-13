@@ -7,17 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNdefMessageCallback
+// Boîte de dialogue qui s'affiche quand on veut envoyer un message sur le tag
+public class BeamDialog extends DialogFragment
 {
 
-    String message;
+    String message; // Variable globale
 
     static BeamDialog newInstance(String message) {
 
         // On crée la nouvelle instance du DialogFragment
         BeamDialog fragment = new BeamDialog();
-
         // On ajoute le message au Bundle, pour le récupérer d'une activité à l'autre
         Bundle args = new Bundle();
         args.putString("message", message);
@@ -30,7 +29,6 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         // Ne pas recréer le fragment (la boîte de dialogue) quand l'activité change
         setRetainInstance(true);
         // On choisit le style : normal et clair
@@ -42,13 +40,13 @@ public class BeamDialog extends DialogFragment // implements NfcAdapter.CreateNd
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View v = inflater.inflate(R.layout.dialog_beam_message, container, false);
-
-        TextView msgTextView = v.findViewById(R.id.message);
-
+        // on lie au fichier xml "dialog_beam_message"
+        View rootView = inflater.inflate(R.layout.dialog_beam_message, container, false);
+        TextView msgTextView = rootView.findViewById(R.id.message);
+        // On affiche le message que l'utilisateur a écrit
         msgTextView.setText("Votre message : " + message);
 
-        return v;
+        return rootView;
     }
 
 }

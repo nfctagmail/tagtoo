@@ -16,28 +16,25 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+// Fragment correspondant à l'onglet accueil (=bout d'activité inséré dans une autre activité)
 public class HomeTabFragment extends Fragment {
 
-    private static NfcAdapter mNfcAdapter;
-
+    // Liste qui contient les messages que l'on veut afficher
     private static ArrayList<SavedMessage> listMessages = new ArrayList<>();
-
+    // Chaîne de caractères pour identifier les messages de la console venant de ce fragment
     private static String LOG_TAG = "TAB_HOME";
-    private static String saved_prefs_id = "TAGTOO_SAVED_PREFS";
-    private static String saved_var_id = "TAGTOO_SAVED_MESSAGES";
-    View rootView;
-    MessagesAdapter messagesAdapter;
 
+    // Fonction appelée à la création du fragment : renvoie tous les éléments à afficher
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // Définition de la variable correspondant à l'objet View renvoyé par l'"inflater" : il lie les fichiers xml à tous ses objets View correspondants (rootView contient tous les objets View du Layout).
-        rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        // Définition de la variable correspondant à l'objet View renvoyé par l'"inflater" : il lie les fichiers xml à tous ses objets View correspondants (rootView contient tous les objets View de la disposition).
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // On récupère l'adaptateur NFC du téléphone, qui va permettre de communiquer avec le tag
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+        NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
-        // On récupère les éléments de Layout nécessaires, que l'on va utiliser (la liste, le texte, le bouton)
+        // On récupère les éléments de Layout nécessaires, que l'on va utiliser (la liste, le texte, le bouton pour actualiser et le bouton d'aide)
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         TextView alerttv          = rootView.findViewById(R.id.alertTextView);
         Button refresh            = rootView.findViewById(R.id.refreshButton);
@@ -69,7 +66,7 @@ public class HomeTabFragment extends Fragment {
             // On envoie un message à la console
             Log.i(LOG_TAG, "No NFC adapter");
 
-            // On quitte l'app avec un message d'erreur.
+            // On quitte l'app avec un message d'erreur affiché à l'utilisateur
             Toast.makeText(getActivity(), "Your device is not compatible with NFC.", Toast.LENGTH_LONG).show();
             getActivity().finish();
         }
@@ -80,18 +77,18 @@ public class HomeTabFragment extends Fragment {
 
             recyclerView.setVisibility(View.GONE);  // On n'affiche pas la liste
             alerttv.setVisibility(View.VISIBLE);    // On affiche le texte d'alerte
-            alerttv.setText(R.string.nfc_disabled); // Le texte affiche qu'il est désactivé
+            alerttv.setText(R.string.nfc_disabled); // Le texte affiche que le NFC est désactivé
             refresh.setVisibility(View.VISIBLE);    // Un bouton "Rafraichir" apparait pour actualiser l'app si le NFC est activé
-            fab.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.VISIBLE);        // On affiche le bouton d'aide
         }
         else if(listMessages.isEmpty())
         {
             alerttv.setVisibility(View.VISIBLE);    // On affiche le texte d'alerte
             alerttv.setText(R.string.list_empty);   // On affiche le texte par défaut
-            fab.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.VISIBLE);        // On affiche le bouton d'aide
         }
 
-        // Action du bouton "Rafraichir"
+        // Action du clic sur le bouton "Rafraichir" =  redémarrer l'activité
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,27 +100,30 @@ public class HomeTabFragment extends Fragment {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                // On fait glisser la liste vers le bas (dy positif) : on cache le bouton d'aide
+                // On fait glisser la liste vers le bas (dy positif) : on cache le bouton d'aide avec une fonction fournie par Android qui anime cette disparition
                 if (dy > 0 && fab.getVisibility() == View.VISIBLE) {
                     fab.hide();
                 }
-                // On fait glisser la liste vers le haut (dy négatif) : on affiche le bouton d'aide
+                // On fait glisser la liste vers le haut (dy négatif) : on affiche le bouton d'aide avec une fonction fournie par Android qui anime cette apparition
                 else if (dy < 0 && fab.getVisibility() != View.VISIBLE) {
                     fab.show();
                 }
             }
         });
-
+        // On affiche dans la console que la longue configuration de ce fragment est terminée
         Log.i(LOG_TAG, "All set");
 
+        // Résultat de la fonction : tous les éléments desquels on vient de modifier les attributs
         return rootView;
     }
 
+    // Fonction pour ajouter un message à la liste
     public void addToAdapter(ArrayList<SavedMessage> list){
-        listMessages    = list;                                                 // la liste propre à ce fragment devient celle renseignée en argument
+        listMessages    = list;                                                 // La liste propre à ce fragment devient celle renseignée en argument de la fonction
+        MessagesAdapter messagesAdapter;
         messagesAdapter = new MessagesAdapter(getActivity(), listMessages);     // On crée une nouvelle instance de l'adaptateur des messages de la liste auquel on donne ces messages
         messagesAdapter.setMessages(listMessages);                              // On donne la liste des messages
-        messagesAdapter.notifyDataSetChanged();                                 // On actualise la liste (en disant que ses données ont changé)
+        messagesAdapter.notifyDataSetChanged();                                 // On actualise la liste (en lui disant que ses données ont changé)
     }
 
 }

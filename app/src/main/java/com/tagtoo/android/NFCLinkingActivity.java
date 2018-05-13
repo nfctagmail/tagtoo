@@ -11,84 +11,88 @@ import android.util.Log;
 
 public class NFCLinkingActivity extends Activity {
 
-    public static int NFC_INTENT_CODE = 101;
+    // Chaine de caractères pour identifier les messages de cette activité dans la console
     private static final String LOG_TAG = "NFC_LINK";
 
-
+    // On ne fait rien lorsque l'activité est créée : elle n'affiche rien de toute façon (@Override = reprendre la fonction orginale de Activity pour la réécrire selon ce fichier)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
             }
 
+    // Quand l'activité est déclenchée
     @Override
     protected void onStart() {
+        // On rappelle quand même la fonction originale avec "super" pour éxécuter ses fonctions par défaut
         super.onStart();
+
+        // On récupère l'intention qui l'a démarrée et si elle correspond à une des 3 intentions de tag NFC on continue
         if (getIntent().getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED) || getIntent().getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED) || getIntent().getAction().equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
 
+            // On crée une nouvelle intention qui contiendra ce qu'on a obtenu de la lecture du tag
             Intent newIntent = new Intent("READ_TAG");
-
-
+            // On crée un nouvel objet "tag" qui contient les informations récupérées par la puce NFC du téléphone (= NfcAdapter)
             Tag tag = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            // On récupère l'identifiant du tag, écrit en octets
             byte[] tagId =  tag.getId();
+            // On utilise une fonction plus bas pour les convertir en une chaine de caractères héxadécimale, qui correspond au numéro de série
             String tagSerialNbr = bytesToHexString(tagId);
+            // On envoie le numéro de série dans la console
             Log.i(LOG_TAG, "Tag serial number : " + tagSerialNbr);
+            // On crée une nouvelle chaine de caratères qui sera le nom du fichier audio que l'on récupérera
             String nameFileTag = "TagSN_" + tagSerialNbr;
-
-
+            // On ajoute cette chaîne-là dans l'intention crée plus tôt, avec l'identifiant "TAG_SERIAL"
             newIntent.putExtra("TAG_SERIAL", nameFileTag);
-
-            // On récupère le(s) message(s). Parcelable sert à envoyer des données à travers des Intents, d'activité à activité par exemple
+            // On récupère le(s) message(s). Parcelable sert à envoyer des ensembles de données à travers des intentions, d'activité à activité par exemple
             Parcelable[] rawMessages = getIntent().getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
             // S'il y a un/des message(s)
             if (rawMessages != null) {
-
+                // On notifie la console
                 Log.i(LOG_TAG, "Tag contient un message");
-
                 // On récupère le premier message contenu dans le Parcelable
                 NdefMessage messages = (NdefMessage) rawMessages[0];
-
-                // On le change en chaîne de caractères
+                // On récupère son contenu et on le change en chaîne de caractères
                 String stringMessage = new String(messages.getRecords()[0].getPayload());
-
+                // On ajoute cette chaîne-là dans l'intention crée plus tôt, avec l'identifiant "TAG_MESSAGE"
                 newIntent.putExtra("TAG_MESSAGE", stringMessage);
-
             }
+            // On envoie cette intention à l'activité qui est en train
             sendBroadcast(newIntent);
-
+            // On termine l'activité
             finish();
         }
         else {
+            // S'il n'y avait pas d'intention correcte au départ pour démarrer l'activité, on la termine
             finish();
         }
     }
 
+    // Fonction pour convertir une source (src) d'octets en chaîne de caractères hexadecimale, qui correspond au numéro de série
     private String bytesToHexString(byte[] src) {
         // On va créer une chaine de caractères à laquelle on ajoutera au fur et à mesure des caractères. Elle commence par "0x"
         StringBuilder stringBuilder = new StringBuilder("0x");
-
         // On arrête tout si l'argument donné est null ou a une longueur null
         if (src == null || src.length <= 0) {
             return null;
         }
-
-        // On ajoutera les caractères par groupe de deux
-        char[] buffer = new char[2];
+        // On ajoutera les caractères par groupe de deux en créant un tableau de 2 caractères
+        char[] tampon = new char[2];
 
         // Pour chaque octet de l'argument
         for (int i = 0; i < src.length; i++) {
-
-            // Traitement du premier caractère puis du deuxième caractère, pour le même octet, les 4 premiers bits correspondront à un caractère en héxadécimal, puis les 4 autres
-            buffer[0] = Character.forDigit((src[i] >>> 4) & 0x0F, 16);      // Dans l'octet src[i] on prend seulement les 4 bits les plus élevés (= à gauche) et on les compare (& = AND) à 0x0F c'est à dire 15 ou encore 0000 1111 (on ne garde donc que les bits de droite)
-            buffer[1] = Character.forDigit(src[i] & 0x0F, 16);              // Character.forDigit() nous donne alors l'équivalent du chiffre binaire de gauche en base 16, donc en héxadécimal
-
+            // Traitement du premier caractère puis du deuxième caractère, pour le même octet, les 4 premiers bits correspondront à un caractère en héxadécimal, puis les 4 autres un autre
+            // Character.forDigit() nous donne l'équivalent du chiffre binaire en base 16, en héxadécimal
+            // 1. dans l'octet src[i], >>> 4 prend seulement les 4 bits les plus élevés (= à gauche), par exemple : à partir de 1010 1111 on obtient 0000 1010
+            // on les compare (& = opérat° binaire AND : 1 ou 0 AND 0 -> 0; 1 AND 1 -> 1) à 0F (16) = 15 (10) = 0000 1111 (2) (on ne garde donc que les bits de droite)
+            tampon[0] = Character.forDigit((src[i] >>> 4) & 0x0F, 16);
+            tampon[1] = Character.forDigit(src[i] & 0x0F, 16);
             // On ajoute ces deux caractères au reste de la chaine
-            stringBuilder.append(buffer);
+            stringBuilder.append(tampon);
         }
 
-        // On retourne la chaine de caractères totale
+        // On retourne la chaine de caractères totale en tant que résultat de la fonction
         return stringBuilder.toString();
     }
-
 
 }

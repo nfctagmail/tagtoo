@@ -30,6 +30,9 @@ import java.io.IOException;
 
 public class WriteTextActivity extends AppCompatActivity {
 
+    /*
+     * Initialisation des variables
+     */
     EditText editText;
     TextView counter;
     FloatingActionButton sendButton;
@@ -42,31 +45,27 @@ public class WriteTextActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // association au fichier xml d'affichage
         setContentView(R.layout.activity_write_text);
 
         context = this;
+        // on récupère l'adaptateur de la puce NFC du téléphone
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
+        // on récupère les objets d'affichages
         editText = findViewById(R.id.editText);
-
         counter = findViewById(R.id.textCompteur);
 
+        // quand le texte change on met à jour le compteur de nombre de lettres
         editText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String textCounter = String.valueOf(editText.getText().length()) + "/100";
                 counter.setText(textCounter);
             }
-
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         sendButton = findViewById(R.id.sendButton);
