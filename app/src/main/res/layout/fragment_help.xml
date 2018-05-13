@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Disposition contrainte : chaque objet est disposé en fonction des autres ou des bords de l'écran, grâce à l'interface d'Android Studio -->
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,6 +8,7 @@
     android:layout_height="match_parent"
     tools:context="com.tagtoo.android.HelpActivity$HelpFragment">
 
+    <!-- titre de la page d'aide -->
     <TextView
         android:id="@+id/section_title"
         android:layout_width="wrap_content"
@@ -24,6 +27,7 @@
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintTop_creator="1" />
 
+    <!-- image de la page d'aide -->
     <ImageView
         android:id="@+id/section_image"
         android:layout_width="wrap_content"
@@ -38,6 +42,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/ic_tagnfc" />
 
+    <!-- description propre à la page d'aide -->
     <TextView
         android:id="@+id/section_desc"
         android:layout_width="286dp"
@@ -54,6 +59,7 @@
         app:layout_constraintTop_toBottomOf="@+id/section_image"
         app:layout_constraintVertical_chainStyle="packed" />
 
+    <!-- Bouton de sortie -->
     <Button
         android:id="@+id/button_end"
         android:layout_width="wrap_content"

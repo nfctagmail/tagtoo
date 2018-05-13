@@ -8,14 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context="com.tagtoo.android.HelpActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
-        android:text="Test"
-        app:layout_anchor="@+id/container"
-        app:layout_anchorGravity="left|top" />
-
+    <!-- Vue en page qui contient les 3 différents fragments-->
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"

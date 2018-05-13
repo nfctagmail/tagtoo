@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Disposition contrainte : chaque objet est disposé en fonction des autres ou des bords de l'écran, grâce à l'interface d'Android Studio -->
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.tagtoo.android.WriteAudioActivity">
 
+    <!-- Bouton d'enregistrement -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/recordButton"
         android:layout_width="132dp"
@@ -22,6 +24,7 @@
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
         app:srcCompat="@drawable/ic_mic_black_24dp" />
 
+    <!-- Barre de progression -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
@@ -34,6 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scounter" />
 
+    <!-- Compteur de secondes écoulées, actualisé programmatiquement -->
     <TextView
         android:id="@+id/scounter"
         android:layout_width="80dp"
@@ -48,6 +52,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Bouton pour jouer l'enregistrement -->
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="36dp"
@@ -64,6 +69,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
 
+    <!-- Bouton d'envoi -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/sendButton"
         android:layout_width="68dp"
@@ -84,6 +90,7 @@
         app:rippleColor="@android:color/black"
         app:srcCompat="@drawable/ic_send_black_24dp" />
 
+    <!-- Texte d'information, texte défini dans strings.xml -->
     <TextView
         android:id="@+id/infoRecordAudio"
         android:layout_width="269dp"

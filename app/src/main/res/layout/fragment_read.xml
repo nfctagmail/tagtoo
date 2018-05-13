@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Onglet de lecture -->
+<!-- Disposition contrainte : chaque objet est disposé en fonction des autres ou des bords de l'écran, grâce à l'interface d'Android Studio -->
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Image avec téléphone émettant des ondes -->
     <ImageView
         android:id="@+id/section_image"
         android:layout_width="wrap_content"
@@ -20,6 +23,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/ic_phonelink_ring_black_192dp" />
 
+    <!-- texte demandant d'approchez le tél. du tag -->
     <TextView
         android:id="@+id/readTextView"
         android:layout_width="272dp"
