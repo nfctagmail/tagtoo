@@ -38,42 +38,53 @@ import java.util.ArrayList;
 // Class gérant tous les messages de la liste de l'onglet d'accueil
 public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.MessageViewHolder> {
 
-    // Contexte de l'activité originale (ici MainActivity) pour avoir accès à ses fonctions
     private static Context mContext;
-    // Liste des messages
     private ArrayList<SavedMessage> messages;
-    // Chaine de caractères pour identifier les messages dans la console
     private String LOG_TAG = "MESSAGES";
 
-    // Constructeur de la classe, appelé quand on en crée un nouvelle instance, qui récupérera donc le contexte de l'activité qui en fait appel et la liste des messages à afficher
     public MessagesAdapter(Context context, ArrayList<SavedMessage> list){
         this.mContext = context;
         messages = list;
     }
-    // On peut toujours modifier la liste des messages après en avoir créé une instance avec cette fonction
+
     public void setMessages(ArrayList<SavedMessage> list){
         this.messages = list;
     }
 
-    // Fonction pour définir la classe qui détermine ce à quoi une ligne de la liste va ressemble = ViewHolder
     @Override
-    public MessagesAdapter.MessageViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        // On récupère l'affichage d'une ligne défini par le fichier xml "list_savedmessage"
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_savedmessage, viewGroup, false);
-        // on le donne à la classe qui va créer chaque ligne, que l'on renvoie en sortie de la fonction
-        return new MessageViewHolder(view);
+    public int getItemViewType(int position) {
+        if (position == messages.size()-1) {
+            return 1;
+        }
+        return 0;
     }
 
-    // Fonction pour afficher les messages une fois que le ViewHolder est associé
+    @Override
+    public MessagesAdapter.MessageViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+        View viewItem = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_savedmessage, viewGroup, false);
+        View viewRead = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fragment_read, viewGroup, false);
+
+        switch (viewType) {
+            case 0:
+                return new MessageViewHolder(viewItem);
+            case 1:
+                return new MessageViewHolder(viewRead);
+        }
+
+        return new MessageViewHolder(viewItem);
+
+    }
+
     @Override
     public void onBindViewHolder(MessagesAdapter.MessageViewHolder holder, final int position) {
         // On récupère l'objet de la liste que l'on est en train de traiter
         final SavedMessage item = messages.get(position);
         // On affiche cet objet
-        holder.display(messages.get(position));
+        //holder.display(messages.get(position));
 
         // S'il y a un fichier audio
-        if(item.fileName != null) {
+        /*if(item.fileName != null) {
             // On crée un nouvel objet de la liste, sans fichier audio associé
             final SavedMessage newMessage = new SavedMessage(item.content, item.serialNbr, item.dateSaved);
             // quand on reste appuyé sur le lecteur audio de l'objet de liste
@@ -117,7 +128,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                     return true;
                 }
             });
-        }
+        }*/
     }
 
     private boolean deleteFile(String fileToDelete, String serialNumber){
@@ -181,13 +192,13 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
     public class MessageViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView title;
-        private final TextView messagetw;
-        private final TextView titleAudio;
+        private final TextView info;
+        /*private final TextView titleAudio;
         private final LinearLayout audioPlayer;
         private final ImageButton deleteButton;
         private final ImageButton playButton;
         private final ProgressBar progressBar;
-        private final TextView counter;
+        private final TextView counter;*/
 
         private MediaPlayer mPlayer = null;
         private String mFileName = null;
@@ -198,19 +209,14 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
         private Thread updateAudioProgress = null;
 
         @SuppressLint("HandlerLeak")
-        public MessageViewHolder(final View itemView){
+        public MessageViewHolder(final View itemView) {
             super(itemView);
             // On récupère chaque objet de la ligne
-            title        = itemView.findViewById(R.id.msgTitle);
-            messagetw    = itemView.findViewById(R.id.message);
-            titleAudio   = itemView.findViewById(R.id.audioMsgTitle);
-            audioPlayer  = itemView.findViewById(R.id.audioPlayer);
-            deleteButton = itemView.findViewById(R.id.deleteButton);
-            playButton   = itemView.findViewById(R.id.playButton);
-            progressBar  = itemView.findViewById(R.id.recordingProgressBar);
-            counter      = itemView.findViewById(R.id.progressCounter);
+            title = itemView.findViewById(R.id.card_title);
+            info = itemView.findViewById(R.id.card_info);
 
-            // on fait appel à la fonction pour supprimer quand on appuye sur le bouton pour supprimer
+        }
+            /*// on fait appel à la fonction pour supprimer quand on appuye sur le bouton pour supprimer
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -273,7 +279,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                 MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                 mmr.setDataSource(mContext, uri);
                 String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                duration = Integer.parseInt(durationStr) / 1000;*/
+                duration = Integer.parseInt(durationStr) / 1000;
                 counter.setText("0s");
             }
         }
@@ -358,7 +364,7 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                 }
             });
         }
-
+        */
     }
 
 }

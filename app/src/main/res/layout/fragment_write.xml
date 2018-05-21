@@ -8,93 +8,212 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <Button
-        android:id="@+id/buttontext"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:background="@color/colorPrimary100"
-        android:drawableBottom="@drawable/ic_insert_comment_black_48dp"
-        android:gravity="center"
-        android:paddingBottom="30dp"
-        android:paddingTop="30dp"
-        android:text="@string/button_text"
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/raleway_semibold"
+        android:text="Write a message"
         android:textColor="@android:color/black"
-        android:textColorHighlight="@color/colorDisabled"
-        app:layout_constraintBottom_toTopOf="@+id/buttonvideo"
-        app:layout_constraintEnd_toStartOf="@+id/buttonaudio"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.88" />
-
-    <Button
-        android:id="@+id/buttonaudio"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:background="@color/colorPrimary100"
-        android:drawableBottom="@drawable/ic_mic_none_black_48dp"
-        android:gravity="center"
-        android:paddingBottom="30dp"
-        android:paddingTop="30dp"
-        android:text="@string/button_audio"
-        app:layout_constraintBottom_toTopOf="@+id/buttonimage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/buttontext"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <Button
-        android:id="@+id/buttonvideo"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
-        android:background="@color/colorPrimary100"
-        android:drawableBottom="@drawable/ic_videocam_black_48dp"
-        android:gravity="center"
-        android:paddingBottom="30dp"
-        android:paddingTop="30dp"
-        android:text="@string/button_video"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buttonimage"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttontext" />
-
-    <Button
-        android:id="@+id/buttonimage"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
-        android:background="@color/colorPrimary100"
-        android:drawableBottom="@drawable/ic_image_black_48dp"
-        android:gravity="center"
-        android:paddingBottom="30dp"
-        android:paddingTop="30dp"
-        android:text="@string/button_image"
+        android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/buttonvideo"
-        app:layout_constraintTop_toBottomOf="@+id/buttonaudio" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.01999998" />
+
+    <Button
+        android:id="@+id/newtag_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button"
+        android:backgroundTint="@color/colorAccent400"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Configure a new tag"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="120dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <Button
+            android:id="@+id/writetag_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/button"
+            android:backgroundTint="@color/colorPrimary300"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Write to an existing tag"
+            android:textColor="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/newtag_button" />
+
+        <LinearLayout
+            android:id="@+id/writeButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorPrimary100"
+            android:orientation="vertical"
+
+            android:visibility="visible">
+
+            <View
+                android:id="@+id/shadow_top"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@drawable/gradient_top" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingTop="40dp">
+
+                <ImageButton
+                    android:id="@+id/text_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button"
+                    android:elevation="2dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:text="Button"
+                    app:srcCompat="@drawable/ic_insert_comment_black_36dp" />
+
+                <ImageButton
+                    android:id="@+id/audio_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button"
+                    android:elevation="2dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    app:srcCompat="@drawable/ic_mic_black_36dp" />
+
+                <ImageButton
+                    android:id="@+id/picture_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button"
+                    android:elevation="2dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    app:srcCompat="@drawable/ic_image_black_36dp" />
+
+                <ImageButton
+                    android:id="@+id/video_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button"
+                    android:elevation="2dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    app:srcCompat="@drawable/ic_videocam_black_36dp" />
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/shadow_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@drawable/gradient_bottom" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/hide_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <TextView
-        android:id="@+id/title_section"
-        android:layout_width="245dp"
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/section_title_write"
+        android:fontFamily="sans-serif"
+        android:text="If this is your first time writing to a tag"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/buttontext"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/newtag_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="271dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="If it's not, click this button and choose the type of message you want to write"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newtag_button"
+        app:layout_constraintVertical_bias="0.8" />
+
 </android.support.constraint.ConstraintLayout>

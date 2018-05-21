@@ -108,10 +108,6 @@ public class MainActivity extends AppCompatActivity {
         // Par défaut, le fragment qui s'affichera quand Main Activity est créé est l'onglet Home
         setFragment(homeTabFragment);
 
-        // On met en place la barre d'outils
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         // Quand on clique sur le bouton d'aide, on démarre l'activité d'aide
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
