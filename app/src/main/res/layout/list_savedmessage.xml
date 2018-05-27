@@ -123,7 +123,9 @@
         android:layout_gravity="center"
         android:layout_margin="5dp"
         android:elevation="5dp"
-        card_view:cardCornerRadius="5dp">
+        card_view:cardCornerRadius="5dp"
+        android:clickable="true"
+        android:transitionName="@string/transition_key">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -136,19 +138,83 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
+                android:paddingLeft="-1dp"
                 android:scaleType="centerCrop"
                 card_view:srcCompat="@drawable/thumbnail_fridge" />
+
+            <LinearLayout
+                android:id="@+id/iconsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/thumbnail"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="80">
+
+                <ImageView
+                    android:id="@+id/messageTextIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="5"
+                    android:scaleType="centerInside"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
+                    android:tint="@color/colorDisabled"
+                    card_view:srcCompat="@drawable/ic_insert_comment_black_36dp" />
+
+                <ImageView
+                    android:id="@+id/messageAudioIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="5"
+                    android:scaleType="centerInside"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
+                    android:tint="@color/colorDisabled"
+                    card_view:srcCompat="@drawable/ic_mic_black_36dp" />
+
+                <ImageView
+                    android:id="@+id/messagePictureIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="5"
+                    android:scaleType="centerInside"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
+                    android:tint="@color/colorDisabled"
+                    card_view:srcCompat="@drawable/ic_image_black_36dp" />
+
+                <ImageView
+                    android:id="@+id/messageVideoIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="5"
+                    android:scaleType="centerInside"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
+                    android:tint="@color/colorDisabled"
+                    card_view:srcCompat="@drawable/ic_videocam_black_36dp" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/card_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/thumbnail"
-                android:layout_margin="10dp"
+                android:layout_below="@id/iconsLayout"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="10dp"
                 android:fontFamily="@font/raleway_semibold"
-                android:text="TextView"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:text="TextView" />
 
             <TextView
                 android:id="@+id/card_info"

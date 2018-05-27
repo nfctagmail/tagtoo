@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- activité principale -->
-<!-- Conteneur d'éléments à disposition verticale : les éléments seront empilés verticalement, un objet = une ligne-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,16 +8,12 @@
     android:orientation="vertical"
     tools:context="com.tagtoo.android.MainActivity">
 
-    <!-- Barre d'outils pré-générée par Android Studio-->
-
-    <!-- Disposition en cadre, qui contiendra les fragments (onglets) -->
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- Bouton d'accès à l'activité d'aide-->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="match_parent"
@@ -34,14 +28,16 @@
             android:tint="@android:color/white"
             app:fabSize="normal"
             app:srcCompat="@drawable/ic_help_outline_black_48dp" />
+
     </FrameLayout>
-    <!-- Barre de navigation entre les onglets -->
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
+        android:background="@android:color/white"
+        android:theme="@style/Widget.BottomNavigationView"
         app:menu="@menu/navigation" />
 
 </LinearLayout>

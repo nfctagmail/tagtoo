@@ -1,27 +1,32 @@
 package com.tagtoo.android;
 
-// Objet contenant toutes les informations pour un objet de la liste de l'onglet accueil
 public class SavedMessage {
 
-    // Initialisation des variables
-    public final String content;    // Contenu (=message texte) du tag
-    public final String serialNbr;  // Numéro de série
-    public final String dateSaved;  // La date où il a été scanné
-    public final String fileName;   // Le nom du fichier du message audio sur l'appareil
+    public final String name;
+    public final String serialNbr;
+    public final String dateSaved;
+    public final String messageText;
+    public final String audioFile;
+    public final String pictureFile;
+    public final String videoFile;
 
-    // Constructeur du fichier dans le cas où il y a seulement un message texte
-    public SavedMessage(String content, String serialNbr, String dateSaved){
-        this.content = content;
-        this.serialNbr = serialNbr;
-        this.dateSaved = dateSaved;
-        this.fileName = null;
+    public SavedMessage(String serialNbr, String name, String dateSaved){
+        this.serialNbr      = serialNbr;
+        this.name           = name;
+        this.dateSaved      = dateSaved;
+        this.messageText    = null;
+        this.audioFile      = null;
+        this.pictureFile    = null;
+        this.videoFile      = null;
     }
 
-    // Constructeur du fichier dans le cas où il y a un message texte et un message audio
-    public SavedMessage(String content, String serialNbr, String dateSaved, String fileName){
-        this.content = content;
-        this.serialNbr = serialNbr;
-        this.dateSaved = dateSaved;
-        this.fileName = fileName;
+    public SavedMessage(String serialNbr, String name, String dateSaved, String messageText, String audioFile, String pictureFile, String videoFile){
+        this.serialNbr      = serialNbr;
+        this.name           = name;
+        this.dateSaved      = dateSaved;
+        this.messageText    = messageText;
+        this.audioFile      = audioFile;
+        this.pictureFile    = pictureFile;
+        this.videoFile      = videoFile;
     }
 }

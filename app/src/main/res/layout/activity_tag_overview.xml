@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:transitionName="@string/transition_key"
+    tools:context="com.tagtoo.android.TagOverviewActivity">
+
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="160dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:cropToPadding="false"
+        android:paddingLeft="-1dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/thumbnail_fridge" />
+
+    <LinearLayout
+        android:id="@+id/iconsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/thumbnail"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="80">
+
+        <ImageView
+            android:id="@+id/messageTextIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="5"
+            android:scaleType="centerInside"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="@color/colorDisabled"
+            app:srcCompat="@drawable/ic_insert_comment_black_36dp" />
+
+        <ImageView
+            android:id="@+id/messageAudioIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="5"
+            android:scaleType="centerInside"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="@color/colorDisabled"
+            app:srcCompat="@drawable/ic_mic_black_36dp" />
+
+        <ImageView
+            android:id="@+id/messagePictureIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="5"
+            android:scaleType="centerInside"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="@color/colorDisabled"
+            app:srcCompat="@drawable/ic_image_black_36dp" />
+
+        <ImageView
+            android:id="@+id/messageVideoIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="5"
+            android:scaleType="centerInside"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="@color/colorDisabled"
+            app:srcCompat="@drawable/ic_videocam_black_36dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/card_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/iconsLayout"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/raleway_semibold"
+        android:text="TextView"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/card_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/card_title"
+        android:layout_below="@+id/card_title"
+        android:layout_marginTop="18dp"
+        android:fontFamily="@font/raleway_light"
+        android:text="TextView" />
+
+    <LinearLayout
+        android:id="@+id/audioPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/card_info"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="4dp"
+            android:layout_weight="0.8"
+            android:background="@color/colorPrimary100"
+            android:contentDescription="@string/play_button"
+            android:tint="@color/colorPrimary700"
+            app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
+
+        <ProgressBar
+            android:id="@+id/recordingProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="4dp"
+            android:layout_weight="8.2"
+            android:max="1000" />
+
+        <TextView
+            android:id="@+id/progressCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:text="0s"
+            android:textAlignment="center" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:srcCompat="@drawable/thumbnail_fridge" />
+
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+</RelativeLayout>

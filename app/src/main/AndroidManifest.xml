@@ -75,13 +75,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 
-            <!-- Définition de l'activité parente : MainActivity -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tagtoo.android.MainActivity" />
         </activity>
 
-        <!-- Définition des 4 autres activités d'écriture -->
         <activity
             android:name=".WriteTextActivity"
             android:screenOrientation="portrait"
@@ -91,7 +89,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".WriteImageActivity"
+            android:name=".WritePictureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -100,6 +98,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ConfigureTagActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TagOverviewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 

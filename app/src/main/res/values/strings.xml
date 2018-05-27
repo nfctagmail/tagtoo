@@ -41,4 +41,5 @@
     <string name="section_help_desc_read">When on the \"Read\" tab of this app, put your phone against the tag to access its content. It will be added to a list of all the ones you read in the \"Home\" Tab.</string>
     <string name="section_help_desc_home">In the \"Home\" tab you can scroll through all the messages you saved and play the audio files that came with them. You can delete permanently delete the audio file by long pressing the audio player.</string>
     <string name="button_end">End</string>
+    <string name="transition_key" translatable="false">scale_card</string>
 </resources>

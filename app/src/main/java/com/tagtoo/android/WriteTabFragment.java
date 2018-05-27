@@ -111,7 +111,7 @@ public class WriteTabFragment extends Fragment {
         buttonImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startWriteActivity(WriteImageActivity.class);
+                startWriteActivity(WritePictureActivity.class);
             }
         });
 

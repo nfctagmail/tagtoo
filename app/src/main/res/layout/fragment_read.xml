@@ -1,41 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Onglet de lecture -->
-<!-- Disposition contrainte : chaque objet est disposé en fonction des autres ou des bords de l'écran, grâce à l'interface d'Android Studio -->
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-    <!-- Image avec téléphone émettant des ondes -->
-    <ImageView
-        android:id="@+id/section_image"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/raleway_semibold"
+        android:text="Your tags"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.02" />
+
+    <FrameLayout
+        android:id="@+id/imageGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="72dp"
         app:layout_constraintBottom_toTopOf="@+id/readTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@drawable/ic_phonelink_ring_black_192dp" />
+        app:layout_constraintVertical_bias="0.55">
 
-    <!-- texte demandant d'approchez le tél. du tag -->
+        <ImageView
+            android:id="@+id/error_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:alpha="0.8"
+            android:scaleX="1.2"
+            android:scaleY="1.2"
+            android:tint="?attr/colorError"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_highlight_off_black_96dp" />
+
+        <ImageView
+            android:id="@+id/section_image"
+            android:layout_width="176dp"
+            android:layout_height="166dp"
+            app:srcCompat="@drawable/ic_phonelink_ring_black_192dp" />
+
+    </FrameLayout>
+
     <TextView
         android:id="@+id/readTextView"
         android:layout_width="272dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/info_read"
         android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/refreshButton"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/section_image"
+        app:layout_constraintTop_toBottomOf="@+id/imageGroup"
         app:layout_constraintVertical_chainStyle="packed" />
+
+    <Button
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button"
+        android:elevation="2dp"
+        android:enabled="false"
+        android:text="Refresh"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/readTextView"
+        app:layout_constraintVertical_bias="0.95" />
+
 </android.support.constraint.ConstraintLayout>
