@@ -255,6 +255,12 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
 
             final Intent intent = new Intent(context, TagOverviewActivity.class);
             intent.putExtra("name", title.getText());
+            intent.putExtra("serial", (String) info.getTag());
+            intent.putExtra("info", info.getText());
+            intent.putExtra("hasText", (boolean) iconText.getTag());
+            intent.putExtra("hasAudio", (boolean) iconAudio.getTag());
+            intent.putExtra("hasPicture", (boolean) iconPicture.getTag());
+            intent.putExtra("hasVideo", (boolean) iconVideo.getTag());
 
             String transitionName = context.getString(R.string.transition_key);
 
@@ -310,20 +316,35 @@ public class MessagesAdapter  extends RecyclerView.Adapter<MessagesAdapter.Messa
                 Resources res = context.getResources();
                 String textTitle = String.format(res.getString(R.string.title_msg_params), formatSerialNbr, savedMessage.dateSaved);
                 info.setText(textTitle);
+                info.setTag(formatSerialNbr);
             }
 
             cardView.setOnClickListener(this);
 
             title.setText(savedMessage.name);
 
-            if(savedMessage.messageText != null)
+
+            iconText.setTag(false);
+            iconAudio.setTag(false);
+            iconPicture.setTag(false);
+            iconVideo.setTag(false);
+
+            if(savedMessage.messageText != null) {
                 iconText.setImageTintList(context.getResources().getColorStateList(R.color.colorPrimary));
-            if(savedMessage.audioFile != null)
+                iconText.setTag(true);
+            }
+            if(savedMessage.audioFile != null) {
                 iconAudio.setImageTintList(context.getResources().getColorStateList(R.color.colorPrimary));
-            if(savedMessage.pictureFile != null)
+                iconAudio.setTag(true);
+            }
+            if(savedMessage.pictureFile != null) {
                 iconPicture.setImageTintList(context.getResources().getColorStateList(R.color.colorPrimary));
-            if(savedMessage.videoFile != null)
+                iconPicture.setTag(true);
+            }
+            if(savedMessage.videoFile != null) {
                 iconVideo.setImageTintList(context.getResources().getColorStateList(R.color.colorPrimary));
+                iconVideo.setTag(true);
+            }
 
             // s'il n'y a pas de fichier audio on n'affiche pas le lecteur audio
             /*if(savedMessage.fileName == null) {

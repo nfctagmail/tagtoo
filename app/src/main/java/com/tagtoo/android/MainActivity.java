@@ -130,9 +130,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-
     public void startHelpActivity(){
         Intent intent = new Intent(this, HelpActivity.class);
         startActivity(intent);
