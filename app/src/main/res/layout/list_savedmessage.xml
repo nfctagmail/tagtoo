@@ -1,120 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Element de liste -->
-<!-- Disposition relative : chaque objet est sous un autre objet, ou à sa gauche etc.-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/border"
-    android:orientation="vertical"
-    android:paddingBottom="5dp"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:paddingTop="5dp">
-
-
-    <TextView
-        android:id="@+id/msgTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/deleteButton"
-        android:text="@string/title_msg_default"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/textMsgTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/msgTitle"
-        android:text="@string/msg_title_text"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@android:color/darker_gray" />
-
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textMsgTitle"
-        android:layout_toStartOf="@+id/deleteButton"
-        android:text="Message"
-        android:textSize="18sp" />
-
-    <ImageButton
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:backgroundTint="@color/colorPrimary"
-        android:text="Button"
-        android:tint="@android:color/background_light"
-        app:srcCompat="@drawable/ic_delete_black_36dp" />
-
-    <TextView
-        android:id="@+id/audioMsgTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/message"
-        android:layout_marginTop="8dp"
-        android:text="@string/msg_title_audio"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@android:color/darker_gray" />
-
-    <LinearLayout
-        android:id="@+id/audioPlayer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/audioMsgTitle"
-        android:layout_gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:weightSum="10">
-
-        <ImageButton
-            android:id="@+id/playButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="4dp"
-            android:layout_weight="0.8"
-            android:background="@color/colorPrimary100"
-            android:contentDescription="@string/play_button"
-            android:tint="@color/colorPrimaryDark"
-            app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
-
-        <ProgressBar
-            android:id="@+id/recordingProgressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="4dp"
-            android:layout_weight="8.2"
-            android:max="1000" />
-
-        <TextView
-            android:id="@+id/progressCounter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="4dp"
-            android:layout_weight="1"
-            android:text="0s"
-            android:textAlignment="center" />
-    </LinearLayout>
-
-</RelativeLayout>
--->
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -122,31 +11,48 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_margin="5dp"
-        android:elevation="5dp"
-        card_view:cardCornerRadius="5dp"
         android:clickable="true"
-        android:transitionName="@string/transition_key">
+        android:elevation="5dp"
+        android:focusable="true"
+        android:transitionName="@string/transition_key"
+        card_view:cardCornerRadius="5dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/thumbnail"
+            <FrameLayout
+                android:id="@+id/thumb_menu"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:paddingLeft="-1dp"
-                android:scaleType="centerCrop"
-                card_view:srcCompat="@drawable/thumbnail_fridge" />
+                android:layout_alignParentTop="true">
+
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingLeft="-1dp"
+                    android:scaleType="centerCrop"
+                    card_view:srcCompat="@drawable/thumbnail_fridge" />
+
+                <ImageButton
+                    android:id="@+id/dotsMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|right"
+                    android:background="@android:color/transparent"
+                    android:padding="5dp"
+                    android:tint="@color/cardview_dark_background"
+                    card_view:srcCompat="@drawable/ic_dots_black_24dp" />
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/iconsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/thumbnail"
+                android:layout_below="@id/thumb_menu"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal"
                 android:weightSum="80">
@@ -205,6 +111,7 @@
 
             </LinearLayout>
 
+
             <TextView
                 android:id="@+id/card_title"
                 android:layout_width="wrap_content"
@@ -213,8 +120,9 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginStart="10dp"
                 android:fontFamily="@font/raleway_semibold"
-                android:textSize="24sp"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textSize="24sp" />
+
 
             <TextView
                 android:id="@+id/card_info"

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayoutCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="100">
+
+    <com.tagtoo.android.CheckableCardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="100"
+        android:foreground="@drawable/card_states"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="3dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/thumbImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="160dp"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/thumbnail_fridge" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/thumbTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|left"
+                android:layout_margin="5dp"
+                android:fontFamily="@font/raleway_medium"
+                android:shadowColor="@android:color/background_dark"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"
+                android:text="Thumbnail"
+                android:textColor="@android:color/background_light"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+    </com.tagtoo.android.CheckableCardView>
+</LinearLayout>

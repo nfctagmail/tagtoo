@@ -28,40 +28,44 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class WriteAudioActivity extends AppCompatActivity {
 
-    // contexte de l'application
     private static Context context;
 
-
-    // Identifiant de l'application dans les logs
     private static final String LOG_TAG = "WRITE_AUDIO_ACTIVITY";
-    // Le nombre 200 correspond au code de requête d'un enregistrement audio auprès du système
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    // Chemin du fichier où sera enregistré le fichier audio
+
     private static String mFileName = null;
 
-    // La variable qui contiendra le numéro de série du tag
     private String tagSerialNbr = null;
-    private String tagMessage = null;
+    private String tagName = null;
+    private String tagDate = null;
 
-    // Classes permettant d'enregistrer et de jouer l'audio
     private MediaRecorder mRecorder = null;
     private MediaPlayer mPlayer = null;
 
-    // Variable booléenne sachant si un enregistrement doit être commencé (=true) ou arrêté (=false)
     private boolean mStartRecording = true;
-    // Variable booléenne permettant d'arrêter l'enregistrement à la fin du compte à rebours, avant que l'utilisateur lève son doigt.
     private boolean isCountDownOver = false;
 
     // Comptes à rebours
@@ -69,33 +73,162 @@ public class WriteAudioActivity extends AppCompatActivity {
     private CountDownTimer mResetTimer;
 
     // Eléments de l'interface
-    private ProgressBar mProgressBar;
-    private TextView mSCounter;
-    private FloatingActionButton mSendButton;
+    ProgressBar mProgressBar;
+    TextView mSCounter;
+    ImageButton mRecordButton;
+    ImageButton mPlayButton;
+    FloatingActionButton mSendButton;
 
     // Variable booléenne pour savoir si l'utilisateur a accepté que l'app enregistre le son, et ainsi continuer
-    // NB : RECORD_AUDIO est considérée comme une permission "dangereuse"
     private boolean permissionToRecordAccepted = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
+
+    /**
+     *  Lors de la création de l'activité
+     */
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_write_audio);
+
+        WriteAudioActivity.context = getApplicationContext();
+
+        // Autorisation d'accès à internet
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        // On crée l'adresse à laquelle le fichier audio en cache sera enregistré, en récupérant l'adresse du cache attribué à l'application
+        mFileName = getExternalCacheDir().getAbsolutePath();
+        mFileName += "/recording_cache.3gp";
+
+        // On demande la permission d'enregistrer un fichier audio
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+        // On récupère les objets d'affichage auxquels on veut attribuer une action (final = variable inchangeable)
+        mRecordButton = findViewById(R.id.recordButton);
+        mPlayButton = findViewById(R.id.playButton);
+        mProgressBar = findViewById(R.id.progressBar);
+        mSCounter = findViewById(R.id.scounter);
+        mSendButton = findViewById(R.id.sendButton);
+
+        mSendButton.setVisibility(View.GONE);
+
+        // on charge l'animation qui fait gonfler le bouton d'enregistrement, qui se répète à l'infini
+        final Animation recordInflateButton = AnimationUtils.loadAnimation(this, R.anim.anim_inflate_button);
+        recordInflateButton.setRepeatCount(Animation.INFINITE);
+
+        // la barre de progression est remise à zéro
+        mProgressBar.setProgress(0);
+
+        // on démarre le compte à rebours qui empêche de faire un enregistrement plus long que 30s et qui fait avancer la barre de progression
+        mCountDownTimer = new CountDownTimer(30000,100) {
+
+            @Override
+            public void onTick(long msUntilFinished) {
+                int i = (30000 - (int)msUntilFinished)/300;
+                mProgressBar.setProgress(i);
+                int s = (30000 - (int)msUntilFinished)/1000;
+                if(s < 10)
+                    mSCounter.setText("0" + s + " / 30 s");
+                else
+                    mSCounter.setText(s + " / 30 s");
+            }
+
+            @Override
+            public void onFinish() {
+                mProgressBar.setProgress(100);
+                mSCounter.setText("30 / 30 s");
+                onRecord(mStartRecording);
+                mStartRecording = !mStartRecording;
+                mRecordButton.clearAnimation();
+                isCountDownOver = true;
+                mSendButton.setVisibility(View.VISIBLE);
+                Log.i(LOG_TAG, "Countdown done");
+            }
+        };
+
+        mRecordButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                // Tant que l'on a le doigt pressé dessus on démarre l'enregistrement
+                if (event.getAction() == MotionEvent.ACTION_DOWN && mStartRecording) {
+                    view.performClick();
+                    onRecord(mStartRecording);
+                    mStartRecording = !mStartRecording;
+                    mRecordButton.startAnimation(recordInflateButton);
+                    mSendButton.setVisibility(View.GONE);
+                    mCountDownTimer.start();
+                }
+                // Si le doigt est relevé on arrête l'enregistrement, à part s'il a déjà été arrêté par le compte à rebours
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if(!isCountDownOver) {
+                        onRecord(mStartRecording);
+                        mStartRecording = !mStartRecording;
+                        mRecordButton.clearAnimation();
+                        mCountDownTimer.cancel();
+                        mSendButton.setVisibility(View.VISIBLE);
+                    }
+                }
+                return true;
+            }
+        });
+
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startPlaying();
+            }
+        });
+
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                beamMessage();
+            }
+        });
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                String action = intent.getAction();
+
+                if(getFragmentManager().findFragmentByTag("beam") != null)
+                    if(action.equals("READ_TAG")) {
+
+                        tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
+                        tagName      = intent.getStringExtra("TAG_NAME");
+                        tagDate      = intent.getStringExtra("TAG_DATE");
+
+                        Log.i(LOG_TAG, "Serial : " + tagSerialNbr + "; Name : " + tagName + "; Date : " + tagDate);
+
+                        if(uploadAudio(tagSerialNbr, tagDate)) {
+                            Toast.makeText(context, R.string.success_write_audio, Toast.LENGTH_LONG).show();
+                            unregisterReceiver(this);
+                            finish();
+                        } else
+                            Toast.makeText(context, R.string.error_write_audio_server, Toast.LENGTH_LONG).show();
+                    }
+            }
+        };
+
+        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Trouver les résultats des demandes de permission ...
         switch(requestCode){
-            // Ici seulement pour RECORD_AUDIO (mais d'autres peuvent être ajoutées)
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        // Si la permission n'est pas acceptée : on quitte l'activité
+
         if(!permissionToRecordAccepted)
             finish();
     }
 
-    @SuppressLint("NewApi")
     private void startPlaying() {
-        // Démarrage de la lecture du fichier audio spécifié
         mPlayer = new MediaPlayer();
         try {
             mPlayer.setDataSource(mFileName);
@@ -106,8 +239,8 @@ public class WriteAudioActivity extends AppCompatActivity {
         }
 
         // Désactiver le bouton Play et changer sa couleur
-        findViewById(R.id.playButton).setEnabled(false);
-        findViewById(R.id.playButton).setBackgroundTintList(this.getResources().getColorStateList(R.color.colorDisabled));
+        mPlayButton.setEnabled(false);
+        mPlayButton.setBackgroundTintList(this.getResources().getColorStateList(R.color.colorDisabled));
 
         // Quand la lecture est terminée
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -119,9 +252,8 @@ public class WriteAudioActivity extends AppCompatActivity {
                     mPlayer = null;
                 }
                 // On réactive le bouton play
-                findViewById(R.id.playButton).setEnabled(true);
-                findViewById(R.id.playButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorPrimary100));
-
+                mPlayButton.setEnabled(true);
+                mPlayButton.setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorPrimary100));
             }
         });
     }
@@ -154,7 +286,6 @@ public class WriteAudioActivity extends AppCompatActivity {
         isCountDownOver = false;
     }
 
-    @SuppressLint("NewApi")
     private void stopRecording() {
 
         // Fin de l'enregsitrement audio : enregistrement stoppé et paramètres réinitialisés
@@ -171,181 +302,41 @@ public class WriteAudioActivity extends AppCompatActivity {
 
         // Ajout d'un temps où l'on ne peut pas appuyer sur le bouton d'enregistrement pour éviter de créer un enregistrement null
         mResetTimer = new CountDownTimer(500,10) {
-            @Override public void onTick(long msUntilFinished){} // Fonction nécessaire pour la classe CountDownTimer
-            // quand le compte à rebours est terminé
+            @Override public void onTick(long msUntilFinished){}
             @Override
             public void onFinish() {
-                // On réactive le bouton
                 findViewById(R.id.recordButton).setClickable(true);
                 findViewById(R.id.recordButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorAccent));
             }
         };
-        // On désactive le bouton
+
         findViewById(R.id.recordButton).setClickable(false);
         findViewById(R.id.recordButton).setBackgroundTintList(WriteAudioActivity.getAppContext().getResources().getColorStateList(R.color.colorDisabled));
-        // on démarre le compte à rebours
+
         mResetTimer.start();
 
-        // On lance la lecture du fichier que l'on vient d'enregistrer
         startPlaying();
     }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_write_audio);
-
-        WriteAudioActivity.context = getApplicationContext();
-        // on permet l'accès à intenet
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        // On crée l'adresse à laquelle le fichier audio en cache sera enregistré, en récupérant l'adresse du cache attribué à l'application
-        mFileName = getExternalCacheDir().getAbsolutePath();
-        mFileName += "/recording_cache.3gp";
-
-        // On demande la permission d'enregistrer un fichier audio
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
-        // On récupère les objets d'affichage auxquels on veut attribuer une action (final = variable inchangeable)
-        final ImageButton mRecordButton = findViewById(R.id.recordButton);
-        final ImageButton mPlayButton = findViewById(R.id.playButton);
-        mProgressBar = findViewById(R.id.progressBar);
-        mSCounter = findViewById(R.id.scounter);
-        mSendButton = findViewById(R.id.sendButton);
-        // On n'affiche pas encore le bouton d'envoi
-        mSendButton.setVisibility(View.GONE);
-
-        // on charge l'animation qui fait gonfler le bouton d'enregistrement, qui se répète à l'infini
-        final Animation recordInflateButton = AnimationUtils.loadAnimation(this, R.anim.anim_inflate_button);
-        recordInflateButton.setRepeatCount(Animation.INFINITE);
-        // la barre de progression est remise à zéro
-        mProgressBar.setProgress(0);
-        // on démarre le compte à rebours qui empêche de faire un enregistrement plus long que 30s et qui fait avancer la barre de progression
-        mCountDownTimer = new CountDownTimer(30000,100) {
-
-            @Override
-            public void onTick(long msUntilFinished) {
-                int i = (30000 - (int)msUntilFinished)/300;
-                mProgressBar.setProgress(i);
-                int s = (30000 - (int)msUntilFinished)/1000;
-                if(s < 10)
-                    mSCounter.setText("0" + s + " / 30 s");
-                else
-                    mSCounter.setText(s + " / 30 s");
-
-            }
-
-            @Override
-            public void onFinish() {
-                mProgressBar.setProgress(100);
-                mSCounter.setText("30 / 30 s");
-                onRecord(mStartRecording);
-                mStartRecording = !mStartRecording;
-                mRecordButton.clearAnimation();
-                isCountDownOver = true;
-                mSendButton.setVisibility(View.VISIBLE);
-                Log.i(LOG_TAG, "Countdown done");
-            }
-        };
-
-        // Quand on touche sur le bouton d'enregistrement
-        mRecordButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                // Tant que l'on a le doigt pressé dessus on démarre l'enregistrement
-                if (event.getAction() == MotionEvent.ACTION_DOWN && mStartRecording) {
-                    view.performClick();
-                    onRecord(mStartRecording);
-                    mStartRecording = !mStartRecording;
-                    mRecordButton.startAnimation(recordInflateButton);
-                    mSendButton.setVisibility(View.GONE);
-                    mCountDownTimer.start();
-                }
-                // si on a le doigt relevé on arrête l'enregistrement, à part s'il a déjà été arrêté par le compte à rebours
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if(!isCountDownOver) {
-                        onRecord(mStartRecording);
-                        mStartRecording = !mStartRecording;
-                        mRecordButton.clearAnimation();
-                        mCountDownTimer.cancel();
-                        mSendButton.setVisibility(View.VISIBLE);
-                    }
-                }
-                return true;
-            }
-        });
-
-        // quand on appuye sur le bouton play on lance la lecture
-        mPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startPlaying();
-            }
-        });
-        // quand on appuye sur le bouton envoyer on affiche la boite de dialogue d'envoi
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                beamMessage();
-            }
-        });
-
-        // on reçoit le numéro de série du tag de la même manière que dans MainActivity
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context ctx, Intent intent) {
-                String action = intent.getAction();
-                // si la boîte de dialogue d'envoi existe
-                if(getFragmentManager().findFragmentByTag("beam") != null)
-                    if(action.equals("READ_TAG")) {
-                        tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
-                        Log.i(LOG_TAG, tagSerialNbr);
-                        tagMessage = intent.getStringExtra("TAG_MESSAGE");
-                        Log.i(LOG_TAG, tagMessage);
-                        // si on a eu le tag nfc on envoie le fichier audio en cache avec le nom du numéro de série du tag
-                        if(uploadAudio(tagSerialNbr)) {
-                            Toast.makeText(context, R.string.success_write_audio, Toast.LENGTH_LONG).show();
-                            unregisterReceiver(this);
-                            finish();
-                        } else
-                            Toast.makeText(context, R.string.error_write_audio_server, Toast.LENGTH_LONG).show();
-                    }
-            }
-        };
-
-        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
-    }
-
     public void beamMessage() {
-        // Commencer la transaction (càd la création/suppression/remplacement) de fragments d'activités
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        // S'il y a déjà  un fragment au tag égal à "beam"
         android.app.Fragment prev = getFragmentManager().findFragmentByTag("beam");
-        //On le supprime
         if (prev != null) {
             ft.remove(prev);
         }
-        // On ajoute la transaction au "back stack" qui tient la liste des transactions pour qu'elles puissent ensuite être annulées, en appuyant par exemple sur le bouton retour
         ft.addToBackStack(null);
 
-        // On crée une instance la boîte de dialogue que l'on veut afficher, à laquelle on envoie le texte écrit
         DialogFragment beamDialog = BeamDialog.newInstance("Message audio");
-        // On affiche la boîte de dialogue, à laquelle on donne le tag "beam"
         beamDialog.show(ft, "beam");
     }
 
-    private boolean uploadAudio(String serialNbr) {
+    private boolean uploadAudio(String serialNbr, String date) {
 
-        File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
+        File directoryCache = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath());
         File audioCache     = new File(directoryCache, "recording_cache.3gp");
-        File audioToUpload  = new File(directoryCache, serialNbr + ".3gp");
-
-        audioCache.renameTo(audioToUpload);
+        File jsonCache      = new File(directoryCache, "Tag_" + serialNbr + "_" + date + ".json");
 
         Log.i(LOG_TAG, "Audio Cache : "     + audioCache.toString());
-        Log.i(LOG_TAG, "Audio renamed : "   + audioToUpload.toString());
 
         FTPClient ftp = null;
         try {
@@ -361,26 +352,68 @@ public class WriteAudioActivity extends AppCompatActivity {
                 ftp.enterLocalPassiveMode();
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-                FileInputStream fileInput = new FileInputStream(audioToUpload);
-                boolean result = ftp.storeFile("/" + serialNbr + ".3gp", fileInput);
-                fileInput.close();
-                ftp.logout();
-                ftp.disconnect();
-                if(result) {
-                    Log.i(LOG_TAG, "Success uploading to server");
-                    return true;
+                FileOutputStream fileOutput = new FileOutputStream(jsonCache);
+                boolean resultOut = ftp.retrieveFile("/Tag_" + serialNbr + "_" + date + ".json", fileOutput);
+                fileOutput.close();
+                SavedMessage tagData = null;
+                SavedMessage newTagData = null;
+                if(resultOut) {
+                    Gson gson = new Gson();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(jsonCache));
+                        Type type = new TypeToken<SavedMessage>() {}.getType();
+                        tagData = gson.fromJson(br, type);
+                        if(tagData != null)
+                            newTagData = tagData;
+
+                        FileInputStream fileInput = new FileInputStream(audioCache);
+                        boolean resultIn = ftp.storeFile("/Tag_" + serialNbr + "_" + date + ".3gp", fileInput);
+                        fileInput.close();
+
+                        if(resultIn) {
+                            Log.i(LOG_TAG, "Success uploading audio file to server");
+                            if(newTagData != null) {
+                                newTagData = new SavedMessage(newTagData.serialNbr, newTagData.name, newTagData.dateCreated, newTagData.thumbnailId, newTagData.dateSaved, newTagData.messageText, true, newTagData.pictureFile, newTagData.videoFile);
+                                String json = gson.toJson(newTagData);
+                                FileWriter file = new FileWriter(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath() + "/Tag_" + serialNbr + "_" + date + ".json");
+                                file.write(json);
+                                file.flush();
+                                file.close();
+
+                                FileInputStream fileInput2 = new FileInputStream(jsonCache);
+                                boolean resultIn2 = ftp.storeFile("/Tag_" + serialNbr + "_" + date + ".json", fileInput2);
+                                fileInput2.close();
+                                ftp.logout();
+                                ftp.disconnect();
+                                if(resultIn2) {
+                                    Log.i(LOG_TAG, "Success uploading tag data to server");
+                                    return true;
+                                }
+                                else {
+                                    Log.i(LOG_TAG, "Error uploading tag data");
+                                    return false;
+                                }
+                            }
+                        }
+                        else {
+                            Log.i(LOG_TAG, "Error uploading audio");
+                            return false;
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    Log.i(LOG_TAG, "Error retrieving tag data");
+                    return false;
                 }
             }
             else {
                 Log.e(LOG_TAG, "Could not connect to server");
                 return false;
             }
-        } catch (SocketException e) {
-            Log.e(LOG_TAG, e.getStackTrace().toString());
-        } catch (UnknownHostException e) {
-            Log.e(LOG_TAG, e.getStackTrace().toString());
         } catch (IOException e) {
-            Log.e(LOG_TAG, e.getStackTrace().toString());
+            e.printStackTrace();
         }
         return false;
     }

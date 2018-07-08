@@ -15,7 +15,7 @@
     <string name="play_button">Bouton de lecture</string>
     <string name="section_title_write">Choissisez le type de message que vous voulez mettre sur le tag.</string>
     <string name="info_record_audio">Restez appué sur le bouton d\'enregistrement pour enregistrer un son de moins de 30 secondes.</string>
-    <string name="info_write_text">Écrivez votre texte ci-dessous. Il ne peut pas faire plus de 100 caractères.</string>
+    <string name="info_write_text">Écrivez votre texte ci-dessous.\nIl ne peut pas faire plus de 100 caractères.</string>
     <string name="info_read">Mettez votre téléphone contre le tag que vous voulez lire.</string>
     <string name="msg_title_text">"Message texte NFC : "</string>
     <string name="msg_title_audio">Message audio NFC :</string>
@@ -41,4 +41,37 @@
     <string name="section_help_desc_read">Dans l\'onglet \"Lire\" de cette app, mettez votre téléphone contre le tag pour accéder à son contenu. Il sera ajouté à la liste de tous ceux que vous avez lu sur l\'onglet \"Accueil\".</string>
     <string name="section_help_desc_home">Dans l\'onglet \"Accueil\", vous pouvez faire défiler tous les messages que vous avez lus et aussi jouer les messages audio qui sont venus avec. Vous pouvez supprimer de manière permanente le fichier audio en restant appuyé sur le lecteur audio.</string>
     <string name="button_end">Terminer</string>
+    <string name="thumbnail_title_kitchen">Cuisine</string>
+    <string name="title_tags">Vos tags</string>
+    <string name="title_write_tab">Écrire un message</string>
+    <string name="button_configure">Configurer un nouveau tag</string>
+    <string name="button_write_msg">Écrire sur un tag existant</string>
+    <string name="title_configure_tag">Configurons votre nouveau tag</string>
+    <string name="title_write_audio">Enregistrer un message audio</string>
+    <string name="label_write_button">Sinon, appuyez sur ce bouton pour choisir le type de message à écrire</string>
+    <string name="label_config_button">Si c\'est la première fois que vous utilisez ce tag</string>
+    <string name="label_config_name_edit">Comment voulez-vous nommer ce tag ? (ex. : Cuisine, Chambre, Bracelet ou Porte-Clés…)</string>
+    <string name="label_config_thumbnails">Choisissez la vignette pour votre tag :</string>
+    <string name="label_config_password_switch">Protéger ce tag avec un mot de passe ?</string>
+    <string name="selected_thumbnail_text">Vignette choisie : %1$s.</string>
+    <string name="next">Suivant</string>
+    <string name="audio">Audio</string>
+    <string name="picture">Image</string>
+    <string name="video">Vidéo</string>
+    <string name="text">Texte</string>
+    <string name="read_success">Tag lu avec succès !</string>
+    <string name="option_remove">Retirer de la liste</string>
+    <string name="option_delete">Supprimer toutes les données</string>
+    <string name="none">aucune</string>
+    <string name="thumbnail_title_other">Autre</string>
+    <string name="thumbnail_title_garage">Garage</string>
+    <string name="thumbnail_title_bedroom">Chambre</string>
+    <string name="thumbnail_title_bathroom">Salle de bain</string>
+    <string name="thumbnail_title_hallway">Hall</string>
+    <string name="thumbnail_title_living_room">Séjour</string>
+    <string name="toast_success_conf">Tag configuré avec succès ! Vous pouvez maintenant écrire sur ce tag.</string>
+    <string name="toast_error_conf_upload">Une erreur est survenue en communiquant avec le serveur. Réessayez plus tard.</string>
+    <string name="toast_error_conf_connect">Une erreur est survenue lors de la connection au serveur. Vérifiez votre connexion internet.</string>
+    <string name="toast_conf_begin">Merci de patienter pendant que votre tag est configuré.</string>
+
 </resources>

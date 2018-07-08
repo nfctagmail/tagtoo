@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,13 +27,29 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Objects;
 
 public class WriteTextActivity extends AppCompatActivity {
 
-    /*
-     * Initialisation des variables
+    /**
+     * Initialisation des variables globales
      */
+
     EditText editText;
     TextView counter;
     FloatingActionButton sendButton;
@@ -42,20 +59,29 @@ public class WriteTextActivity extends AppCompatActivity {
     IntentFilter writeTagFilters[];
     Context context;
 
+    private String tagSerialNbr = null;
+    private String tagName = null;
+    private String tagDate = null;
+
+    private static final String LOG_TAG = "WRITE_TEXT_ACTIVITY";
+
+
+    /**
+     *  Lors de la création de l'activité
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // association au fichier xml d'affichage
         setContentView(R.layout.activity_write_text);
 
         context = this;
-        // on récupère l'adaptateur de la puce NFC du téléphone
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        // on récupère les objets d'affichages
+
         editText = findViewById(R.id.editText);
         counter = findViewById(R.id.textCompteur);
+        sendButton = findViewById(R.id.sendButton);
 
-        // quand le texte change on met à jour le compteur de nombre de lettres
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -63,12 +89,16 @@ public class WriteTextActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String textCounter = String.valueOf(editText.getText().length()) + "/100";
                 counter.setText(textCounter);
+                if(editText.getText().length() > 100 || editText.getText().length() == 0)
+                    sendButton.hide();
+                else
+                    sendButton.show();
             }
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        sendButton = findViewById(R.id.sendButton);
+        sendButton.setVisibility(View.GONE);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,100 +106,123 @@ public class WriteTextActivity extends AppCompatActivity {
             }
         });
 
-        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
-        writeTagFilters = new IntentFilter[] { tagDetected };
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                String action = intent.getAction();
 
+                if(getFragmentManager().findFragmentByTag("beam") != null)
+                    if(action.equals("READ_TAG")) {
 
+                        tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
+                        tagName      = intent.getStringExtra("TAG_NAME");
+                        tagDate      = intent.getStringExtra("TAG_DATE");
+
+                        Log.i(LOG_TAG, "Serial : " + tagSerialNbr + "; Name : " + tagName + "; Date : " + tagDate);
+
+                        if(uploadText(editText.getText().toString(), tagSerialNbr, tagDate)) {
+                            Toast.makeText(context, R.string.success_write_text, Toast.LENGTH_LONG).show();
+                            unregisterReceiver(this);
+                            finish();
+                        } else
+                            Toast.makeText(context, R.string.error_write_text_server, Toast.LENGTH_LONG).show();
+                    }
+            }
+        };
+
+        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
     }
 
+    /**
+     * Affichage de la boîte de dialogue
+     */
+
     public void beamMessage() {
-        // Commencer la transaction (càd la création/suppression/remplacement) de fragments d'activités
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        // S'il y a déjà  un fragment au tag égal à "beam"
         android.app.Fragment prev = getFragmentManager().findFragmentByTag("beam");
-        //On le supprime
         if (prev != null) {
             ft.remove(prev);
         }
-        // On ajoute la transaction au "back stack" qui tient la liste des transactions pour qu'elles puissent ensuite être annulées, en appuyant par exemple sur le bouton retour
         ft.addToBackStack(null);
 
-
         editText = findViewById(R.id.editText);
-        // On crée une instance la boîte de dialogue que l'on veut afficher, à laquelle on envoie le texte écrit
         DialogFragment beamDialog = BeamDialog.newInstance("\"" + editText.getText().toString() + "\"");
-        // On affiche la boîte de dialogue, à laquelle on donne le tag "beam"
         beamDialog.show(ft, "beam");
     }
 
+    private boolean uploadText(String text, String serialNbr, String date) {
 
-    private void write(String text, Tag tag) throws IOException, FormatException {
-        Log.i("WRITING", text);
+        File directoryCache = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath());
+        File audioCache     = new File(directoryCache, "recording_cache.3gp");
+        File jsonCache      = new File(directoryCache, "Tag_" + serialNbr + "_" + date + ".json");
 
-        // Création du message en format NDEF avec le texte saisi par l'utilisateur encodé en octets de type MIME (ex: image/jpeg) correspondant à  celui de l'application
-        NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createMime("application/com.tagtoo.android", text.getBytes())});
+        Log.i(LOG_TAG, "Audio Cache : "     + audioCache.toString());
 
-        Ndef ndef = Ndef.get(tag);      // Création d'une instance du tag
-        ndef.connect();                 // Activation de la connection téléphone/tag
-        ndef.writeNdefMessage(message); // On y écrit le message
-        ndef.close();                   // Désactivation de la connection téléphone/tag
-    }
+        FTPClient ftp = null;
+        try {
+            ftp = new FTPClient();
+            ftp.connect(SendMessageActivity.verser);
 
-    Tag myTag;
-    @Override
-    protected void onNewIntent(Intent intent) {
-        setIntent(intent);
+            Log.i(LOG_TAG, "Trying to connect to the server");
 
-        // Si l'utilisateur a cliqué sur le bouton pour afficher la boîte de dialogue
-        if(getFragmentManager().findFragmentByTag("beam") != null) {
-            // Si l'action de l'intention correspond à un tag NFC
-            if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords))
+            {
+                Log.i(LOG_TAG, "Connection to the server successful");
 
-                // On récupère les informations du tag, contenues dans l'intention
-                myTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                ftp.enterLocalPassiveMode();
+                ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
-                // On récupère le message écrit par l'utilisateur
-                final EditText message = findViewById(R.id.editText);
+                FileOutputStream fileOutput = new FileOutputStream(jsonCache);
+                boolean resultOut = ftp.retrieveFile("/Tag_" + serialNbr + "_" + date + ".json", fileOutput);
+                fileOutput.close();
+                SavedMessage tagData = null;
+                SavedMessage newTagData = null;
+                if(resultOut) {
+                    Gson gson = new Gson();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(jsonCache));
+                        Type type = new TypeToken<SavedMessage>() {}.getType();
+                        tagData = gson.fromJson(br, type);
+                        if(tagData != null){
+                            newTagData = new SavedMessage(tagData.serialNbr, tagData.name, tagData.dateCreated, tagData.thumbnailId, tagData.dateSaved, text, tagData.audioFile, tagData.pictureFile, tagData.videoFile);
+                            String json = gson.toJson(newTagData);
+                            FileWriter file = new FileWriter(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath() + "/Tag_" + serialNbr + "_" + date + ".json");
+                            file.write(json);
+                            file.flush();
+                            file.close();
 
-                // On essaye de lancer la fonction qui écrit sur le tag (seulement si un tag a bien été découvert)
-                try {
-                    if (myTag != null) {
-                        write(message.getText().toString(), myTag);
-                        Toast.makeText(context, R.string.success_write_text, Toast.LENGTH_LONG).show();
-                        finish();
+                            FileInputStream fileInput2 = new FileInputStream(jsonCache);
+                            boolean resultIn2 = ftp.storeFile("/Tag_" + serialNbr + "_" + date + ".json", fileInput2);
+                            fileInput2.close();
+                            ftp.logout();
+                            ftp.disconnect();
+                            if(resultIn2) {
+                                Log.i(LOG_TAG, "Success uploading tag data to server");
+                                return true;
+                            }
+                            else {
+                                Log.i(LOG_TAG, "Error uploading tag data");
+                                return false;
+                            }
+                        }
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
                     }
-                    else {
-                        Toast.makeText(context, R.string.error_write_text_tag, Toast.LENGTH_LONG).show();
-                    }
-                } catch (IOException e) {
-                    Toast.makeText(context, R.string.error_write_text_io, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                } catch (FormatException e) {
-                    Toast.makeText(context, R.string.error_write_text_format, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
+                }
+                else {
+                    Log.i(LOG_TAG, "Error retrieving tag data");
+                    return false;
                 }
             }
+            else {
+                Log.e(LOG_TAG, "Could not connect to server");
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-
-    /**
-     *  Quand l'activité passe en arrière-plan on désactive l'envoi du message
-     */
-    @Override
-    public void onPause(){
-        super.onPause();
-        mNfcAdapter.disableForegroundDispatch(this);
-    }
-
-    /**
-     *  Quand l'activité repasse en premier-plan on active l'envoi du message
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, writeTagFilters, null);
+        return false;
     }
 
 }

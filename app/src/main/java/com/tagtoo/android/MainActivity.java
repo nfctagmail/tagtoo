@@ -16,15 +16,26 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.transition.ChangeBounds;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.SocketException;
@@ -32,13 +43,13 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private static Context context;
 
     private static ArrayList<SavedMessage> listMessages = new ArrayList<>();
-    private static ArrayList<SavedMessage> gsonMessages = new ArrayList<>();
 
     private BottomNavigationView navigation;
 
@@ -48,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String tagSerialNbr = null;
     private String tagName = null;
+    private String tagDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +72,14 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         // On récupère les messages enregistrés grâce à SharedPreferences
-        SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);      // On récupère les préférences de l'application correspondant à l'identifiant stocké dans saved_prefs_id
-        Gson gson                = new Gson();                                              // On crée une nouvelle instance de Gson, permettant de convertir notre liste d'objets complexe en Json et inversement
-        String messagesSaved     = mPrefs.getString(saved_var_id, null);                // On récupère les données correspondant à l'identifiant stocké dans saved_var_id
-        Type type                = new TypeToken<ArrayList<SavedMessage>>() {}.getType();   // On crée le type correspondant à celui de la liste
-        gsonMessages             = gson.fromJson(messagesSaved, type);                      // On récupère les données en json que l'on met au type de la liste et que l'on stocke dans une version temporaire de la liste de messages
-        if(gsonMessages != null)                                                            // Si cette version temporaire de la liste n'est pas nulle
-            listMessages = gsonMessages;                                                    // On donne sa valeur à la véritable liste.
+        SharedPreferences mPrefs = context.getSharedPreferences(saved_prefs_id, 0);
+        Gson gson                = new Gson();
+        String messagesSaved     = mPrefs.getString(saved_var_id, null);
+        Type type                = new TypeToken<ArrayList<SavedMessage>>() {}.getType();
+
+        ArrayList<SavedMessage> gsonMessages = gson.fromJson(messagesSaved, type);
+        if(gsonMessages != null)
+            listMessages = gsonMessages;
 
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -83,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        getWindow().setSharedElementEnterTransition(new ChangeBounds().setDuration(2000));
+        getWindow().setSharedElementReturnTransition(returnTransition());
 
         HomeTabFragment homeTabFragment = new HomeTabFragment();
         homeTabFragment.addToAdapter(listMessages);
@@ -104,30 +120,36 @@ public class MainActivity extends AppCompatActivity {
                 if (navigation.getSelectedItemId() == R.id.navigation_read)
                     if (action.equals("READ_TAG")) {
                         tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
-                        Log.i(LOG_TAG, "TAG DATA : serial = " + tagSerialNbr);
                         tagName = intent.getStringExtra("TAG_NAME");
-                        Log.i(LOG_TAG, "TAG DATA : name = " + tagName);
+                        tagDate = intent.getStringExtra("TAG_DATE");
+
+                        Log.i(LOG_TAG, "TAG DATA = Serial : " + tagSerialNbr + "; Name : " + tagName + "; Date : " + tagDate);
 
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
-                        Long time = System.currentTimeMillis()/1000;
-                        String timeString = time.toString();
+                        SavedMessage tagData = downloadData(tagSerialNbr, tagDate);
+                        listMessages.add(new SavedMessage(tagSerialNbr, tagData.name, tagDate, tagData.thumbnailId, currentDateTimeString, tagData.messageText, tagData.audioFile, tagData.pictureFile, tagData.videoFile));
 
-                        if (downloadFile(tagSerialNbr, timeString))
-                            listMessages.add(new SavedMessage(tagSerialNbr, tagName, currentDateTimeString, null, tagSerialNbr + "_download" + time + ".3gp", null, null));
-                        else
-                            listMessages.add(new SavedMessage(tagSerialNbr, tagName, currentDateTimeString));
+                        downloadFile(tagSerialNbr, tagDate);
 
                         HomeTabFragment homeTabFragment = new HomeTabFragment();
                         homeTabFragment.addToAdapter(listMessages);
-                        navigation.setSelectedItemId(R.id.navigation_read);
                         saveMessages(listMessages);
+                        setFragment(homeTabFragment);
+                        Toast.makeText(context, R.string.read_success, Toast.LENGTH_SHORT).show();
                     }
             }
         };
 
         registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
 
+    }
+
+    private Transition returnTransition(){
+        ChangeBounds bounds = new ChangeBounds();
+        bounds.setInterpolator(new DecelerateInterpolator(1.5f));
+        bounds.setDuration(400);
+        return bounds;
     }
 
     public void startHelpActivity(){
@@ -145,15 +167,67 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "Saving messages");
     }
 
-    private boolean downloadFile(String serialNbr, String time){
+    public SavedMessage downloadData(String serialNbr, String date){
+        File directoryCache = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath());
+        File jsonCache      = new File(directoryCache, "Tag_" + serialNbr + "_" + date + ".json");
+        FTPClient ftp = null;
+        try {
+            ftp = new FTPClient();
+            ftp.connect(SendMessageActivity.verser);
+
+            Log.i(LOG_TAG, "Trying to connect to the server");
+
+            if(ftp.login(SendMessageActivity.seamen, SendMessageActivity.swords))
+            {
+                Log.i(LOG_TAG, "Connection to the server successful");
+
+                ftp.enterLocalPassiveMode();
+                ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+                FileOutputStream fileOutput = new FileOutputStream(jsonCache);
+                boolean resultOut = ftp.retrieveFile("/Tag_" + serialNbr + "_" + date + ".json", fileOutput);
+                fileOutput.close();
+                SavedMessage tagData = null;
+                SavedMessage newTagData = null;
+                if(resultOut) {
+                    Gson gson = new Gson();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(jsonCache));
+                        Type type = new TypeToken<SavedMessage>() {}.getType();
+                        tagData = gson.fromJson(br, type);
+                        if(tagData != null) {
+                            Log.i(LOG_TAG, tagData.serialNbr);
+                            newTagData = tagData;
+                            return newTagData;
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    Log.i(LOG_TAG, "Error retrieving tag data");
+                    return null;
+                }
+            }
+            else {
+                Log.e(LOG_TAG, "Could not connect to server");
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private boolean downloadFile(String serialNbr, String date){
 
         FTPClient ftp = null;
 
-        File directoryCache = new File(getExternalCacheDir().getAbsolutePath());
-        File audioToDownload  = new File(directoryCache, serialNbr + "_download" + time + ".3gp");
+        File directoryCache = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath());
+        File audioToDownload  = new File(directoryCache, "Tag_" + serialNbr + "_" + date + ".3gp");
 
-        try{
-
+        try {
             ftp = new FTPClient();
 
             ftp.connect(SendMessageActivity.verser);
@@ -167,9 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
 
                 FileOutputStream fileOutput = new FileOutputStream(audioToDownload);
-
-                boolean result = ftp.retrieveFile("/" + serialNbr + ".3gp", fileOutput);
-
+                boolean result = ftp.retrieveFile("/Tag_" + serialNbr + "_" + date + ".3gp", fileOutput);
                 fileOutput.close();
 
                 if(result) {
@@ -187,14 +259,6 @@ public class MainActivity extends AppCompatActivity {
             }
             else
                 Log.e(LOG_TAG, "Could not connect to server");
-        }
-
-        catch (SocketException e) {
-            Log.e(LOG_TAG, e.getStackTrace().toString());
-            return false;
-        } catch (UnknownHostException e) {
-            Log.e(LOG_TAG, e.getStackTrace().toString());
-            return false;
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getStackTrace().toString());
             return false;

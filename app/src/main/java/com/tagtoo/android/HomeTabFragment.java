@@ -85,6 +85,7 @@ public class HomeTabFragment extends Fragment {
         messagesAdapter = new MessagesAdapter(getActivity(), listMessages);     // On crée une nouvelle instance de l'adaptateur des messages de la liste auquel on donne ces messages
         messagesAdapter.setMessages(listMessages);                              // On donne la liste des messages
         messagesAdapter.notifyDataSetChanged();                                 // On actualise la liste (en lui disant que ses données ont changé)
+        Log.i(LOG_TAG, getActivity() + "");
     }
 
 }

@@ -18,4 +18,8 @@
     <color name="colorAccent400">#ffca28</color>
     <color name="colorAccent600">#ffb300</color>
     <color name="colorDisabled">#adadad</color>
+    <color name="buttonPressed">#e2e2e2</color>
+    <color name="buttonFocused">#ededed</color>
+    <color name="cardPressed">#4003a9f4</color>
+    <color name="cardChecked">#8003a9f4</color>
 </resources>

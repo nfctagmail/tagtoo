@@ -1,54 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Disposition contrainte : chaque objet est disposé en fonction des autres ou des bords de l'écran, grâce à l'interface d'Android Studio -->
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="30dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="30dp">
 
-    <!-- Image avec téléphone émettant des ondes -->
-    <ImageView
-        android:id="@+id/section_image"
-        android:layout_width="wrap_content"
-        android:layout_height="194dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:srcCompat="@drawable/ic_phonelink_ring_black_192dp" />
-
-    <!-- texte demandant d'approchez le tél. du tag -->
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:fontFamily="sans-serif"
         android:text="Approchez votre téléphone du tag"
+        android:textAlignment="center"
         android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/section_image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.00999999" />
+        android:textStyle="bold" />
 
-    <!-- texte contenant le message écrit par l'utilisateur -->
+    <ImageView
+        android:id="@+id/section_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:srcCompat="@drawable/ic_phonelink_ring_black_192dp" />
+
     <TextView
         android:id="@+id/message"
-        android:layout_width="222dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Message"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/section_image" />
-</android.support.constraint.ConstraintLayout>
+        android:textAlignment="center" />
+
+</LinearLayout>

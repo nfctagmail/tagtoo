@@ -101,7 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/card_title"
         android:layout_below="@+id/card_title"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/raleway_light"
         android:text="TextView" />
 
@@ -146,7 +146,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/raleway_semibold"
-                            android:text="Text"
+                            android:text="@string/text"
                             android:textSize="18sp" />
 
                         <TextView
@@ -188,7 +188,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="0.8"
                             android:fontFamily="@font/raleway_semibold"
-                            android:text="Audio recording"
+                            android:text="@string/audio"
                             android:textSize="18sp" />
 
                         <LinearLayout
@@ -213,7 +213,7 @@
                                 app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
 
                             <ProgressBar
-                                android:id="@+id/recordingProgressBar"
+                                android:id="@+id/audioProgressBar"
                                 style="?android:attr/progressBarStyleHorizontal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -267,7 +267,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:fontFamily="@font/raleway_semibold"
-                            android:text="Picture"
+                            android:text="@string/picture"
                             android:textSize="18sp" />
 
                         <ImageView
@@ -310,7 +310,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/raleway_semibold"
-                            android:text="Video"
+                            android:text="@string/video"
                             android:textSize="18sp" />
 
                         <VideoView

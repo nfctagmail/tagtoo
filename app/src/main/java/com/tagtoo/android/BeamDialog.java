@@ -32,7 +32,7 @@ public class BeamDialog extends DialogFragment
         // Ne pas recréer le fragment (la boîte de dialogue) quand l'activité change
         setRetainInstance(true);
         // On choisit le style : normal et clair
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog);
+        setStyle(DialogFragment.STYLE_NO_TITLE, android.R.style.Theme_Material_Light_Dialog);
 
         message = getArguments().getString("message");
     }
@@ -44,7 +44,7 @@ public class BeamDialog extends DialogFragment
         View rootView = inflater.inflate(R.layout.dialog_beam_message, container, false);
         TextView msgTextView = rootView.findViewById(R.id.message);
         // On affiche le message que l'utilisateur a écrit
-        msgTextView.setText("Votre message : " + message);
+        msgTextView.setText(message);
 
         return rootView;
     }
