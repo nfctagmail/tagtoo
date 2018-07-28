@@ -1,6 +1,5 @@
 package com.tagtoo.android;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
@@ -8,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -16,25 +14,19 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.StrictMode;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -54,11 +46,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -225,13 +214,13 @@ public class ConfigureTagActivity extends AppCompatActivity {
                         write(nameField.getText().toString(), myTag);
                     }
                     else {
-                        Toast.makeText(context, R.string.error_write_text_tag, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, R.string.error_configure_tag, Toast.LENGTH_LONG).show();
                     }
                 } catch (IOException e) {
-                    Toast.makeText(context, R.string.error_write_text_io, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, R.string.error_configure_io, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } catch (FormatException e) {
-                    Toast.makeText(context, R.string.error_write_text_format, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, R.string.error_configure_format, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -314,13 +303,13 @@ public class ConfigureTagActivity extends AppCompatActivity {
         }
         char[] tampon = new char[2];
 
-        for (int i = 0; i < src.length; i++) {
+        for (byte aSrc : src) {
             // Traitement du premier caractère puis du deuxième caractère, pour le même octet, les 4 premiers bits correspondront à un caractère en héxadécimal, puis les 4 autres un autre
             // Character.forDigit() nous donne l'équivalent du chiffre binaire en base 16, en héxadécimal
             // 1. dans l'octet src[i], >>> 4 prend seulement les 4 bits les plus élevés (= à gauche), par exemple : à partir de 1010 1111 on obtient 0000 1010
             // on les compare (& = opérat° binaire AND : 1 ou 0 AND 0 -> 0; 1 AND 1 -> 1) à 0F (16) = 15 (10) = 0000 1111 (2) (on ne garde donc que les bits de droite)
-            tampon[0] = Character.forDigit((src[i] >>> 4) & 0x0F, 16);
-            tampon[1] = Character.forDigit(src[i] & 0x0F, 16);
+            tampon[0] = Character.forDigit((aSrc >>> 4) & 0x0F, 16);
+            tampon[1] = Character.forDigit(aSrc & 0x0F, 16);
             stringBuilder.append(tampon);
         }
 
@@ -349,7 +338,7 @@ public class ConfigureTagActivity extends AppCompatActivity {
 
         File newTagJson = new File(getExternalCacheDir().getAbsolutePath(), "newtag.json");
 
-        FTPClient ftp = null;
+        FTPClient ftp;
         try {
             ftp = new FTPClient();
             ftp.connect(SendMessageActivity.verser);
@@ -402,7 +391,7 @@ public class ConfigureTagActivity extends AppCompatActivity {
         private final List<ThumbViewHolder> holderList;
         private int selectedThumbnail;
 
-        public ThumbAdapter(List<Pair<Integer, Integer>> list){
+        ThumbAdapter(List<Pair<Integer, Integer>> list){
             thumbs = list;
             holderList = new ArrayList<>();
         }

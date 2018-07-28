@@ -6,9 +6,13 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <uses-feature
         android:name="android.hardware.nfc"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera"
         android:required="true" />
 
     <!-- Définition des paramètres de l'app : permission de backup, icone, icone ronde, nom, theme et des activités qu'elle contient. -->
@@ -107,6 +111,18 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.tagtoo.android.fileprovider"
+            android:enabled="true"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

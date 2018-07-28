@@ -53,6 +53,8 @@ public class WriteAudioActivity extends AppCompatActivity {
 
     private static Context context;
 
+    BroadcastReceiver broadcastReceiver;
+
     private static final String LOG_TAG = "WRITE_AUDIO_ACTIVITY";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
@@ -188,7 +190,7 @@ public class WriteAudioActivity extends AppCompatActivity {
             }
         });
 
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 String action = intent.getAction();
@@ -213,6 +215,41 @@ public class WriteAudioActivity extends AppCompatActivity {
         };
 
         registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                String action = intent.getAction();
+
+                if(getFragmentManager().findFragmentByTag("beam") != null)
+                    if(action.equals("READ_TAG")) {
+
+                        tagSerialNbr = intent.getStringExtra("TAG_SERIAL");
+                        tagName      = intent.getStringExtra("TAG_NAME");
+                        tagDate      = intent.getStringExtra("TAG_DATE");
+
+                        Log.i(LOG_TAG, "Serial : " + tagSerialNbr + "; Name : " + tagName + "; Date : " + tagDate);
+
+                        if(uploadAudio(tagSerialNbr, tagDate)) {
+                            Toast.makeText(context, R.string.success_write_audio, Toast.LENGTH_LONG).show();
+                            unregisterReceiver(this);
+                            finish();
+                        } else
+                            Toast.makeText(context, R.string.error_write_audio_server, Toast.LENGTH_LONG).show();
+                    }
+            }
+        };
+
+        registerReceiver(broadcastReceiver, new IntentFilter("READ_TAG"));
+    }
+
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -331,7 +368,6 @@ public class WriteAudioActivity extends AppCompatActivity {
     }
 
     private boolean uploadAudio(String serialNbr, String date) {
-
         File directoryCache = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath());
         File audioCache     = new File(directoryCache, "recording_cache.3gp");
         File jsonCache      = new File(directoryCache, "Tag_" + serialNbr + "_" + date + ".json");

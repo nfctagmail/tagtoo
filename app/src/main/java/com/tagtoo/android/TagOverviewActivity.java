@@ -2,9 +2,12 @@ package com.tagtoo.android;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +23,16 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TagOverviewActivity extends AppCompatActivity {
 
@@ -36,6 +43,8 @@ public class TagOverviewActivity extends AppCompatActivity {
     ImageButton playButton;
     ProgressBar progressBar;
     TextView counter;
+    ImageView imageView;
+    VideoView videoView;
     HorizontalScrollView hScrollView;
     LinearLayout textLayout, audioLayout, pictureLayout, videoLayout;
     LinearLayout.LayoutParams layoutParams;
@@ -73,8 +82,9 @@ public class TagOverviewActivity extends AppCompatActivity {
         textLayout    = findViewById(R.id.textLayout);
         audioLayout   = findViewById(R.id.audioLayout);
         pictureLayout = findViewById(R.id.pictureLayout);
+        imageView     = findViewById(R.id.imageView);
         videoLayout   = findViewById(R.id.videoLayout);
-
+        videoView     = findViewById(R.id.videoView);
         TagOverviewActivity.context = getApplicationContext();
 
         getWindow().setSharedElementEnterTransition(new ChangeBounds().setDuration(250));
@@ -144,6 +154,7 @@ public class TagOverviewActivity extends AppCompatActivity {
             };
         }
 
+
     }
 
     @Override
@@ -173,10 +184,26 @@ public class TagOverviewActivity extends AppCompatActivity {
             iconText.setImageTintList(getResources().getColorStateList(R.color.colorPrimary));
         if(hasAudio)
             iconAudio.setImageTintList(getResources().getColorStateList(R.color.colorPrimary));
-        if(hasPicture)
+        if(hasPicture) {
             iconPicture.setImageTintList(getResources().getColorStateList(R.color.colorPrimary));
-        if(hasVideo)
+            File picture = new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath(), "Tag_" + serialNbr + "_" + date + ".jpg");
+            Bitmap bitmap = new BitmapDrawable(context.getResources(), picture.getAbsolutePath()).getBitmap();
+            int newHeight = (int) (bitmap.getHeight() * (512.0 / bitmap.getWidth()));
+            Log.i(LOG_TAG, bitmap.getWidth() + " " + bitmap.getHeight() + " " + newHeight + "");
+            Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, 512, newHeight, true);
+            imageView.setImageBitmap(newBitmap);
+        }
+        if(hasVideo) {
             iconVideo.setImageTintList(getResources().getColorStateList(R.color.colorPrimary));
+            MediaController mediaController = new MediaController(this);
+            mediaController.setAnchorView(videoView);
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(Uri.fromFile(new File(Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath(), "Tag_" + serialNbr + "_" + date + ".mp4")));
+            videoView.start();
+        }
+
+        TextView pictureTitle = findViewById(R.id.pictureTitle);
+        pictureTitle.bringToFront();
 
     }
 

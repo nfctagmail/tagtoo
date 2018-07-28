@@ -15,7 +15,7 @@
     <string name="play_button">Bouton de lecture</string>
     <string name="section_title_write">Choissisez le type de message que vous voulez mettre sur le tag.</string>
     <string name="info_record_audio">Restez appué sur le bouton d\'enregistrement pour enregistrer un son de moins de 30 secondes.</string>
-    <string name="info_write_text">Écrivez votre texte ci-dessous.\nIl ne peut pas faire plus de 100 caractères.</string>
+    <string name="info_write_text">Écrivez votre texte ci-dessous.\nIl ne peut pas faire plus de 248 caractères.</string>
     <string name="info_read">Mettez votre téléphone contre le tag que vous voulez lire.</string>
     <string name="msg_title_text">"Message texte NFC : "</string>
     <string name="msg_title_audio">Message audio NFC :</string>
@@ -26,9 +26,9 @@
     <string name="cancel">Annuler</string>
     <string name="yes">Oui</string>
     <string name="success_write_text">Message écrit avec succès !</string>
-    <string name="error_write_text_tag">Erreur, tag non détécté. Réessayez.</string>
-    <string name="error_write_text_io">Erreur lors de la connexion au tag. Réessayez.</string>
-    <string name="error_write_text_format">Erreur dans le message : votre message contient peut-être des caractères interdits ou est trop long.</string>
+    <string name="error_configure_tag">Erreur, tag non détécté. Réessayez.</string>
+    <string name="error_configure_io">Erreur lors de la connexion au tag. Réessayez.</string>
+    <string name="error_configure_format">Erreur dans le nom : votre message contient peut-être des caractères interdits ou est trop long.</string>
     <string name="success_write_audio">Enregistrement audio associé au tag avec succès !</string>
     <string name="error_write_audio_server">Connexion au serveur sans succès. Soyez sûr d\'être connecté et réessayez.</string>
     <string name="error_write_audio_connection">Erreur de connexion.</string>
@@ -73,5 +73,10 @@
     <string name="toast_error_conf_upload">Une erreur est survenue en communiquant avec le serveur. Réessayez plus tard.</string>
     <string name="toast_error_conf_connect">Une erreur est survenue lors de la connection au serveur. Vérifiez votre connexion internet.</string>
     <string name="toast_conf_begin">Merci de patienter pendant que votre tag est configuré.</string>
+    <string name="error_write_text_server">Erreur : le tag n\'a pas été correctement détecté. Veuillez réessayer.</string>
+    <string name="success_write_picture">Image associée au tag avec succès !</string>
+    <string name="error_write_picture_server">Connexion au serveur sans succès. Soyez sûr d\'être connecté et réessayez.</string>
+    <string name="success_write_video">Vidéo associée au tag avec succès !</string>
+    <string name="download_fail">Une erreur est survenue lors du téléchargement des données du tag.</string>
 
 </resources>
